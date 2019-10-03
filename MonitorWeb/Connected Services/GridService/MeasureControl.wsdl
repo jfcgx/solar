@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://tempuri.org/" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="MeasureControl" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://tempuri.org/Imports">
+      <xsd:import schemaLocation="http://127.0.0.1:2480/grid?xsd=xsd0" namespace="http://tempuri.org/" />
+      <xsd:import schemaLocation="http://127.0.0.1:2480/grid?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IMeasureControl_SetEstado_InputMessage">
+    <wsdl:part name="parameters" element="tns:SetEstado" />
+  </wsdl:message>
+  <wsdl:message name="IMeasureControl_SetEstado_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SetEstadoResponse" />
+  </wsdl:message>
+  <wsdl:message name="IMeasureControl_GetEstado_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetEstado" />
+  </wsdl:message>
+  <wsdl:message name="IMeasureControl_GetEstado_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetEstadoResponse" />
+  </wsdl:message>
+  <wsdl:message name="IMeasureControl_GetLog_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetLog" />
+  </wsdl:message>
+  <wsdl:message name="IMeasureControl_GetLog_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetLogResponse" />
+  </wsdl:message>
+  <wsdl:message name="IMeasureControl_Resumen_InputMessage">
+    <wsdl:part name="parameters" element="tns:Resumen" />
+  </wsdl:message>
+  <wsdl:message name="IMeasureControl_Resumen_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ResumenResponse" />
+  </wsdl:message>
+  <wsdl:message name="IMeasureControl_Manual_InputMessage">
+    <wsdl:part name="parameters" element="tns:Manual" />
+  </wsdl:message>
+  <wsdl:message name="IMeasureControl_Manual_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ManualResponse" />
+  </wsdl:message>
+  <wsdl:portType name="IMeasureControl">
+    <wsdl:operation name="SetEstado">
+      <wsdl:input wsam:Action="http://tempuri.org/IMeasureControl/SetEstado" message="tns:IMeasureControl_SetEstado_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/IMeasureControl/SetEstadoResponse" message="tns:IMeasureControl_SetEstado_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetEstado">
+      <wsdl:input wsam:Action="http://tempuri.org/IMeasureControl/GetEstado" message="tns:IMeasureControl_GetEstado_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/IMeasureControl/GetEstadoResponse" message="tns:IMeasureControl_GetEstado_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetLog">
+      <wsdl:input wsam:Action="http://tempuri.org/IMeasureControl/GetLog" message="tns:IMeasureControl_GetLog_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/IMeasureControl/GetLogResponse" message="tns:IMeasureControl_GetLog_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="Resumen">
+      <wsdl:input wsam:Action="http://tempuri.org/IMeasureControl/Resumen" message="tns:IMeasureControl_Resumen_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/IMeasureControl/ResumenResponse" message="tns:IMeasureControl_Resumen_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="Manual">
+      <wsdl:input wsam:Action="http://tempuri.org/IMeasureControl/Manual" message="tns:IMeasureControl_Manual_InputMessage" />
+      <wsdl:output wsam:Action="http://tempuri.org/IMeasureControl/ManualResponse" message="tns:IMeasureControl_Manual_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BasicHttpBinding_IMeasureControl" type="tns:IMeasureControl">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="SetEstado">
+      <soap:operation soapAction="http://tempuri.org/IMeasureControl/SetEstado" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetEstado">
+      <soap:operation soapAction="http://tempuri.org/IMeasureControl/GetEstado" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetLog">
+      <soap:operation soapAction="http://tempuri.org/IMeasureControl/GetLog" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Resumen">
+      <soap:operation soapAction="http://tempuri.org/IMeasureControl/Resumen" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Manual">
+      <soap:operation soapAction="http://tempuri.org/IMeasureControl/Manual" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="MeasureControl">
+    <wsdl:port name="BasicHttpBinding_IMeasureControl" binding="tns:BasicHttpBinding_IMeasureControl">
+      <soap:address location="http://127.0.0.1:2480/grid" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
