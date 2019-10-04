@@ -31,12 +31,12 @@ namespace CCD
         private string _key;
         public  string PowerOff ;
         public  string PowerOn ;
-        public static int _tipo=0;
         private bool _manual;
         int _ponderacion;
         double _temperatura;
         double _humedad;
         private bool _bloqueo;
+        private EnumTipoCarga _tipoCarga;
 
         public event EventHandler InputData;
         protected void OnInputChanged(object sender)
@@ -156,6 +156,7 @@ namespace CCD
             }
         }
 
+        public EnumTipoCarga TipoCarga { get => _tipoCarga; set => _tipoCarga = value; }
 
         public bool CambiaEstado(bool value)
         {
@@ -286,8 +287,9 @@ namespace CCD
         public Dispositivo()
         {
         }
-        public Dispositivo(string nombre, int powerConsumption, int ponderacion, string trigger, double interval, string ip, ConnectionType connection, ModuleType moduleType, string key)
+        public Dispositivo(string nombre, EnumTipoCarga tipoCarga, int powerConsumption, int ponderacion, string trigger, double interval, string ip, ConnectionType connection, ModuleType moduleType, string key)
         {
+            _tipoCarga = tipoCarga;
             _moduleType = moduleType;
             Ponderacion = ponderacion;
             this.Ip = ip;

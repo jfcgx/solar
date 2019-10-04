@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DDS238.cs" />
+    <Compile Include="EnumTipoCarga.cs" />
     <Compile Include="Inversor.cs" />
     <Compile Include="Meteo.cs" />
     <Compile Include="RegisterAddress.cs" />

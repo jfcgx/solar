@@ -266,6 +266,8 @@ namespace CCD
         }
         public void Monitor(object sender, System.Timers.ElapsedEventArgs e)
         {
+            _gc.CheckAlMenosUnaBombaActiva();
+
             if (!_meter.Status)
             {
                 if (_cuentaMedidorSinConexion >= _medidorTimeOut)
@@ -334,8 +336,6 @@ namespace CCD
                                 EscribeLog(_inverter.bs_inverter_print_stats());
                                 if (_inverter.Inverter_stat.pv_dc_voltage > 100)
                                 {
-                                    _gc.CheckAlMenosUnaBombaActiva();
-
                                     _gc.MantieneEstado(true);
 
                                     EscribeLog(_gc.Consume(_potenciaActiva, potenciaInv));

@@ -14,7 +14,7 @@ namespace CCD
     public class Inversor
     {
         //https://github.com/egophil/PV-SysReader
-        Dispositivo _swInversor = new Dispositivo("Inversor", -2000,0, "grid", 3, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
+        Dispositivo _swInversor = new Dispositivo("Inversor", EnumTipoCarga.Inversor, -2000,0, "grid", 3, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
 
         HttpClient httpClient = new HttpClient();
 

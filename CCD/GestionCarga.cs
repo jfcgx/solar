@@ -56,13 +56,14 @@ namespace CCD
         {
             _mantieneEstado = true;
             _dispositivos = new List<Dispositivo>();
-            Dispositivo AmbarTablero = new Dispositivo("AmbarTablero", 100, 1, "l03ambar", 3, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
-            Dispositivo AmbarPileta = new Dispositivo("AmbarPileta", 100, 1, "l02ambar", 3, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
-            Dispositivo LedPileta = new Dispositivo("LedPileta", 30, 1, "l01led", 5, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
-            Dispositivo LedTablero = new Dispositivo("LedTablero", 90, 1, "l02led", 5, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY); //porque tenia 100?
-            Dispositivo Filtro = new Dispositivo("Filtro", 900, 1, "filtro_piscina", 2, "192.168.0.52", ConnectionType.tasmota, ModuleType.Basic, "1");
-            Dispositivo Bomba01 = new Dispositivo("Bomba01", 400, 1, "bomba01", 2, "192.168.0.50", ConnectionType.tasmota, ModuleType.Dual, "1");
-            Dispositivo Bomba02 = new Dispositivo("Bomba02", 800, 2, "bomba02", 2, "192.168.0.50", ConnectionType.tasmota, ModuleType.Dual, "2");
+
+            Dispositivo AmbarTablero = new Dispositivo("AmbarTablero", EnumTipoCarga.Luz, 90, 1, "l03ambar", 3, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
+            Dispositivo AmbarPileta = new Dispositivo("AmbarPileta", EnumTipoCarga.Luz, 90, 1, "l02ambar", 3, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
+            Dispositivo LedPileta = new Dispositivo("LedPileta", EnumTipoCarga.Luz, 30, 1, "l01led", 5, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
+            Dispositivo LedTablero = new Dispositivo("LedTablero", EnumTipoCarga.Luz, 90, 1, "l02led", 5, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY); //porque tenia 100?
+            Dispositivo Filtro = new Dispositivo("Filtro", EnumTipoCarga.Bomba, 1000, 1, "filtro_piscina", 2, "192.168.0.52", ConnectionType.tasmota, ModuleType.Basic, "1");
+            Dispositivo Bomba01 = new Dispositivo("Bomba01", EnumTipoCarga.Bomba, 400, 1, "bomba01", 2, "192.168.0.50", ConnectionType.tasmota, ModuleType.Dual, "1");
+            Dispositivo Bomba02 = new Dispositivo("Bomba02", EnumTipoCarga.Bomba, 800, 2, "bomba02", 2, "192.168.0.50", ConnectionType.tasmota, ModuleType.Dual, "2");
 
             _dispositivos.Add(AmbarTablero);
             _dispositivos.Add(AmbarPileta);
@@ -156,12 +157,12 @@ namespace CCD
             if (!_dispositivos.First(p => p.Nombre.Equals("Bomba01")).Estado && !_dispositivos.First(p => p.Nombre.Equals("Bomba02")).Estado)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Ninguna bomba activa conmuta a bomba 1");
+                Console.WriteLine("!!!!!!!!!!! Ninguna bomba activa conmuta a Bomba01 !!!!!!!!!!!!!!!!!!!");
                 Console.ResetColor();
 
                 _bomba01ComoCarga = false;
 
-                _dispositivos.First(p => p.Nombre.Equals("Bomba01")).Bloqueo = _bomba01ComoCarga ? false : true;
+                _dispositivos.First(p => p.Nombre.Equals("Bomba01")).Bloqueo = true;
 
                 _dispositivos.First(p => p.Nombre.Equals("Bomba01")).CambiaEstado(true);
                 Thread.Sleep(2000);

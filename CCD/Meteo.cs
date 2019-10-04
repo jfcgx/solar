@@ -17,7 +17,7 @@ namespace CCD
             //_fileLog.WriteLine("Fecha;Temperatura;Humedad");
             //_fileLog.Flush();
 
-            var dsi = new Dispositivo("Termometro", 0, 0, string.Empty, 1, "192.168.0.49", ConnectionType.tasmota, ModuleType.TH, "1");
+            var dsi = new Dispositivo("Termometro", EnumTipoCarga.Termo, 0, 0, string.Empty, 1, "192.168.0.49", ConnectionType.tasmota, ModuleType.TH, "1");
             dsi.MantieneEstado(true);
             dsi.Interval = 60000;
             dsi.InputData += Dsi_InputData;
