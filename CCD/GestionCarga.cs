@@ -57,13 +57,13 @@ namespace CCD
             _mantieneEstado = true;
             _dispositivos = new List<Dispositivo>();
 
-            Dispositivo AmbarTablero = new Dispositivo("AmbarTablero", EnumTipoCarga.Luz, 90, 1, "l03ambar", 3, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
-            Dispositivo AmbarPileta = new Dispositivo("AmbarPileta", EnumTipoCarga.Luz, 90, 1, "l02ambar", 3, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
+            Dispositivo AmbarTablero = new Dispositivo("AmbarTablero", EnumTipoCarga.Luz, 100, 1, "l03ambar", 3, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
+            Dispositivo AmbarPileta = new Dispositivo("AmbarPileta", EnumTipoCarga.Luz, 100, 1, "l02ambar", 3, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
             Dispositivo LedPileta = new Dispositivo("LedPileta", EnumTipoCarga.Luz, 30, 1, "l01led", 5, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
-            Dispositivo LedTablero = new Dispositivo("LedTablero", EnumTipoCarga.Luz, 90, 1, "l02led", 5, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY); //porque tenia 100?
-            Dispositivo Filtro = new Dispositivo("Filtro", EnumTipoCarga.Bomba, 1000, 1, "filtro_piscina", 2, "192.168.0.52", ConnectionType.tasmota, ModuleType.Basic, "1");
-            Dispositivo Bomba01 = new Dispositivo("Bomba01", EnumTipoCarga.Bomba, 400, 1, "bomba01", 2, "192.168.0.50", ConnectionType.tasmota, ModuleType.Dual, "1");
-            Dispositivo Bomba02 = new Dispositivo("Bomba02", EnumTipoCarga.Bomba, 800, 2, "bomba02", 2, "192.168.0.50", ConnectionType.tasmota, ModuleType.Dual, "2");
+            Dispositivo LedTablero = new Dispositivo("LedTablero", EnumTipoCarga.Luz, 100, 1, "l02led", 5, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY); //porque tenia 100?
+            Dispositivo Filtro = new Dispositivo("Filtro", EnumTipoCarga.Filtro, 1000, 1, "filtro_piscina", 2, "192.168.0.52", ConnectionType.tasmota, ModuleType.Basic, "1");
+            Dispositivo Bomba01 = new Dispositivo("Bomba01", EnumTipoCarga.BombaAux, 400, 1, "bomba01", 2, "192.168.0.50", ConnectionType.tasmota, ModuleType.Dual, "1");//0,37kw segun mANUL
+            Dispositivo Bomba02 = new Dispositivo("Bomba02", EnumTipoCarga.BombaRiego, 800, 2, "bomba02", 2, "192.168.0.50", ConnectionType.tasmota, ModuleType.Dual, "2");
 
             _dispositivos.Add(AmbarTablero);
             _dispositivos.Add(AmbarPileta);
@@ -182,7 +182,7 @@ namespace CCD
                         _consumoActual = potenciaActiva + potenciaInversor;
                         Console.WriteLine("_consumoActual {0} = potenciaActiva {1} + potenciaInversor {2}", _consumoActual, potenciaActiva, potenciaInversor);
 
-                        if (_countEsperaIncremento == _esperaIncremento)
+                        if (_countEsperaIncremento == _esperaIncremento )
                         {
                             MantieneEstado(false); // durante el ciclo de cambio no se mantengan los estados de forma automática
 
@@ -272,6 +272,11 @@ namespace CCD
                         else
                         {
                             _countEsperaIncremento++;
+
+                            //if (Math.Abs( potenciaActiva ) > 400)
+                            //{
+                            //    _countEsperaIncremento++;
+                            //}
                         }
                     }
                     else
@@ -280,27 +285,21 @@ namespace CCD
                     }
 
                     _cargaTotal = 0;
-                    //if (_bomba01ComoCarga && !(d.Nombre.Equals("Bomba02")))
-                    //    _cargaTotal += d.Estado ? d.PowerConsumption : 0;
-                    //else
-                    //{
-                    //    if (!(d.Nombre.Equals("Bomba01")))
-                    //    {
-                    //        _cargaTotal += d.Estado ? d.PowerConsumption : 0;
-                    //    }
-                    //}
+
+
+                    //_cargaTotal = _dispositivos.Where(p => p.TipoCarga != EnumTipoCarga.BombaRiego).Where(p => p.Estado).Sum(s => s.PowerConsumption);
+                    //if (_bomba01ComoCarga) _cargaTotal += _dispositivos.Where(p => p.TipoCarga != EnumTipoCarga.BombaAux).FirstOrDefault().Estado ? _dispositivos.Where(p => p.TipoCarga != EnumTipoCarga.BombaAux).FirstOrDefault().PowerConsumption : 0;
+
                     _cargaTotal += _dispositivos.First(p => p.Nombre.Equals("LedPileta")).Estado ? _dispositivos.First(p => p.Nombre.Equals("LedPileta")).PowerConsumption : 0;
                     _cargaTotal += _dispositivos.First(p => p.Nombre.Equals("LedTablero")).Estado ? _dispositivos.First(p => p.Nombre.Equals("LedTablero")).PowerConsumption : 0;
                     _cargaTotal += _dispositivos.First(p => p.Nombre.Equals("AmbarTablero")).Estado ? _dispositivos.First(p => p.Nombre.Equals("AmbarTablero")).PowerConsumption : 0;
                     _cargaTotal += _dispositivos.First(p => p.Nombre.Equals("AmbarPileta")).Estado ? _dispositivos.First(p => p.Nombre.Equals("AmbarPileta")).PowerConsumption : 0;
                     _cargaTotal += _dispositivos.First(p => p.Nombre.Equals("Filtro")).Estado ? _dispositivos.First(p => p.Nombre.Equals("Filtro")).PowerConsumption : 0;
                     if (_bomba01ComoCarga) _cargaTotal += _dispositivos.First(p => p.Nombre.Equals("Bomba01")).Estado ? _dispositivos.First(p => p.Nombre.Equals("Bomba01")).PowerConsumption : 0;
-                    //_cargaTotal += Bomba2.Estado ? Bomba2.PowerConsumption : 0;
+
                     foreach (var d in _dispositivos)
                     {
                         sb.AppendFormat(string.Format("{0}:{1}| ", d.Nombre, d.Estado ? "ON" : "OFF"));
-
-
                     }
 
                     sb.Append(Environment.NewLine);

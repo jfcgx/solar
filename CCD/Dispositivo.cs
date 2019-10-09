@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace CCD
 {
@@ -151,12 +152,13 @@ namespace CCD
         {
             set
             {
-                _timer.Interval = value;
-                _timer.Start();
+                Timer.Interval = value;
+                Timer.Start();
             }
         }
 
         public EnumTipoCarga TipoCarga { get => _tipoCarga; set => _tipoCarga = value; }
+        public System.Timers.Timer Timer { get => _timer; set => _timer = value; }
 
         public bool CambiaEstado(bool value)
         {
@@ -307,9 +309,9 @@ namespace CCD
             if (interval > 0)
             {
                 interval = interval * 60000 + random.Next(-59000, 59000);
-                _timer = new System.Timers.Timer(interval);
-                _timer.Elapsed += timer_Elapsed;
-                _timer.Start();
+                Timer = new System.Timers.Timer(interval);
+                Timer.Elapsed += timer_Elapsed;
+                Timer.Start();
                 Console.WriteLine("Dispositivo {0} se actualizará con un intervalo de {1:0.00} minutos", _nombre, interval / 60000);
             }
         }
@@ -322,9 +324,9 @@ namespace CCD
             }
 
             double interval = 5 * 60000 + random.Next(-60000, 60000);
-            _timer = new System.Timers.Timer(interval);
-            _timer.Elapsed += timer_Elapsed;
-            _timer.Start();
+            Timer = new System.Timers.Timer(interval);
+            Timer.Elapsed += timer_Elapsed;
+            Timer.Start();
             Console.WriteLine("Dispositivo {0} se actualizará con un intervalo de {1:0.00} minutos", _nombre, interval / 60000);
         }
 

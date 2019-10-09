@@ -23,7 +23,7 @@ namespace Test
             //Console.Read();
             //Ini();
             var dsi = new Meteo();
-            dsi.IniciaLectura();
+            dsi.Inicia();
             //dsi.AnalizaRespuesta(res);
             ////res = System.Net.WebUtility.HtmlDecode(res);
             ////var lec = res.Substring(res.IndexOf("{t}") + 3, res.LastIndexOf("{t}")-3);

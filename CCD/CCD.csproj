@@ -66,6 +66,7 @@
     </Compile>
     <Compile Include="SocketServer.cs" />
     <Compile Include="ModuleType.cs" />
+    <Compile Include="Termometro.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

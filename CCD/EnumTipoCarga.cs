@@ -10,7 +10,9 @@ namespace CCD
     {
         Led,
         Luz,
-        Bomba,
+        BombaRiego,
+        BombaAux,
+        Filtro,
         Termo,
         Inversor
     }

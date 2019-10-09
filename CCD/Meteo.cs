@@ -2,32 +2,58 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CCD
 {
     public class Meteo
     {
-
+        bool _nubulizador;      
+     
         System.IO.StreamWriter _fileLog;
-        public void IniciaLectura()
+        Termometro _termometro;
+
+        System.Timers.Timer _timer;
+        public System.Timers.Timer Timer { get => _timer; set => _timer = value; }
+        public Meteo()
+        {        
+
+         
+        }
+        private void timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            _fileLog.WriteLine("{0};{1};{2}", DateTime.Now.ToString(), _termometro.Temperatura, _termometro.Humedad);
+            _fileLog.Flush();
+
+            if (_termometro.Humedad <= 70 && !_termometro.AumentoHumedad)
+            {
+                ((Dispositivo)sender).CambiaEstado(true);
+            }
+            else if (_termometro.Humedad > 60 && _termometro.AumentoHumedad)
+            {
+                ((Dispositivo)sender).CambiaEstado(false);
+            }
+        }
+
+        public void Inicia()
         {
             string log = string.Format(@"log\log_meteo_{0}.txt", DateTime.Now.ToString("yyyyMMdd"));
             _fileLog = System.IO.File.AppendText(log);
-            //_fileLog.WriteLine("Fecha;Temperatura;Humedad");
-            //_fileLog.Flush();
 
-            var dsi = new Dispositivo("Termometro", EnumTipoCarga.Termo, 0, 0, string.Empty, 1, "192.168.0.49", ConnectionType.tasmota, ModuleType.TH, "1");
-            dsi.MantieneEstado(true);
-            dsi.Interval = 60000;
-            dsi.InputData += Dsi_InputData;
+            _termometro = new Termometro();
+            _termometro.IniciaLectura();
+
+            while (DateTime.Now.Second != 0)
+            {
+                Thread.Sleep(1);
+            }
+            Timer = new System.Timers.Timer();
+            Timer.Interval = 60000;
+            Timer.Elapsed += timer_Elapsed;
+            Timer.Start();
+
         }
 
-        private void Dsi_InputData(object sender, EventArgs e)
-        {
-            Console.WriteLine("Temperatura  :{0} \nHumedad      :{1}", ((Dispositivo)sender).Temperatura, ((Dispositivo)sender).Humedad);
-            _fileLog.WriteLine("{0};{1};{2}", DateTime.Now.ToString(),((Dispositivo)sender).Temperatura, ((Dispositivo)sender).Humedad);
-            _fileLog.Flush();
-        }
     }
 }

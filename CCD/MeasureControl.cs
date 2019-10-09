@@ -226,7 +226,7 @@ namespace CCD
             EscribeLog(string.Format("Estado monitor {0}", _meter.Status));
 
             _meteo = new Meteo();
-            _meteo.IniciaLectura();
+            _meteo.Inicia();
         }
         public void EstadoApp()
         {
