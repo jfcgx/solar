@@ -221,8 +221,10 @@ namespace CCD
             {
                 Console.WriteLine("Inversor Timeout");
                 _cuentaTimeOutParaReiniciarElSocket++;
+
                 if (_cuentaTimeOutParaReiniciarElSocket >= _maxTimeOutReinicioSocket)
                 {
+                    _cuentaTimeOutParaReiniciarElSocket = 0;
                     _clientRs.TerminaSocket();
                     _clientRs.IniciarSocket();
                 }

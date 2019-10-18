@@ -9,40 +9,43 @@ namespace CCD
 {
     public class Termometro
     {
+        Dispositivo _dispositivo;
         double _temperatura;
         double _humedad;
 
         bool _aumentoHumedad;
 
         List<double> _lecturaHumedad;
-        int _nMuestra = 60;
-        int _nParaDecirAumento = 30;
+        List<double> _lecturaTemperatura;
+        int _nMuestra = 30;
         public double Temperatura { get => _temperatura; set => _temperatura = value; }
         public double Humedad { get => _humedad; set => _humedad = value; }
         public bool AumentoHumedad { get => _aumentoHumedad; set => _aumentoHumedad = value; }
+        public Dispositivo Dispositivo { get => _dispositivo; set => _dispositivo = value; }
 
-        public Termometro()
+        public Termometro(int numeroMuestas)
         {
-          
+            _nMuestra = numeroMuestas;
         }
 
         public void IniciaLectura()
         {
+            Dispositivo = new Dispositivo("Termometro", EnumTipoCarga.Termo, 0, 0, string.Empty, 1, "192.168.0.49", ConnectionType.tasmota, ModuleType.TH, "1");
+
             _lecturaHumedad = new List<double>();
+            _lecturaTemperatura = new List<double>();
 
-            var dsi = new Dispositivo("Termometro", EnumTipoCarga.Termo, 0, 0, string.Empty, 1, "192.168.0.49", ConnectionType.tasmota, ModuleType.TH, "1");
+            Dispositivo.MantieneEstado(true);
 
-            dsi.MantieneEstado(true);
-
-            dsi.Timer.Stop();
+            Dispositivo.Timer.Stop();
 
             while (DateTime.Now.Second != 0)
             {
                 Thread.Sleep(1);
             }
 
-            dsi.Interval = 10000;
-            dsi.InputData += Dsi_InputData;
+            Dispositivo.Interval = 10000;
+            Dispositivo.InputData += Dsi_InputData;
         }
 
         private void Dsi_InputData(object sender, EventArgs e)
@@ -54,22 +57,28 @@ namespace CCD
             _lecturaHumedad.Insert(0, humedad); // mantiene idea lista filo
             if (_lecturaHumedad.Count > _nMuestra) _lecturaHumedad.RemoveAt(_nMuestra);
 
+            _lecturaTemperatura.Insert(0, temperatura);
+            if (_lecturaTemperatura.Count > _nMuestra) _lecturaTemperatura.RemoveAt(_nMuestra);
+
             AumentoHumedad = false;
 
             double promedioHumedad = 0;
+            double promedioTemperatura = 0;
 
             promedioHumedad = _lecturaHumedad.Sum() / _lecturaHumedad.Count;
+            promedioTemperatura = _lecturaTemperatura.Sum() / _lecturaTemperatura.Count;
 
-            if (_lecturaHumedad.Last() < humedad) AumentoHumedad = true;
+            if (promedioHumedad < humedad) AumentoHumedad = true;
 
             Console.ForegroundColor = ConsoleColor.Magenta;
-            Console.WriteLine("Temperatura     :{0} " +
-                            "\nHumedad Promedio:{1}", temperatura, promedioHumedad);
-            Console.WriteLine("Humedad actual  :{0}", humedad);
-            Console.WriteLine("Muestras humedad:{0}", _lecturaHumedad.Count);
-            Console.WriteLine("Humedad aumento :{0}", AumentoHumedad);
+            Console.WriteLine("Temperatura promedio:{0:0.00} " +
+                            "\nTemperatura actual__:{1:0.00}" +
+                            "\nHumedad Promedio____:{2:0.00}", promedioTemperatura, temperatura, promedioHumedad);
+            Console.WriteLine("Humedad actual______:{0:0.00}", humedad);
+            Console.WriteLine("Muestras humedad____:{0}", _lecturaHumedad.Count);
+            Console.WriteLine("Humedad aumento_____:{0}", AumentoHumedad);
             Console.ResetColor();
-            _temperatura = temperatura;
+            _temperatura = promedioTemperatura;
             _humedad = promedioHumedad;
         }
     }

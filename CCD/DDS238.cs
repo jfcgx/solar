@@ -256,7 +256,7 @@ namespace CCD
                         EnviaSolicitud();
                     }
                 }
-                else if (DateTime.Now.Second % 3 == 0)
+                else if (DateTime.Now.Second % 2 == 0)
                 {
 
                     _registerAddress = DDSRegisterAddress.ActivePower;
@@ -297,12 +297,12 @@ namespace CCD
             {
                 _status = _clientRs.BinaryWriter(_dsf.ToBytes());
 
-                if (_muestraDatosConsola)
-                {
-                    Console.WriteLine("BinaryWriter");
-                    _dsf.ToBytes().ToList().ForEach(item => Console.Write(string.Format("{0:X} ", item)));
-                    Console.WriteLine();
-                }
+                //if (_muestraDatosConsola)
+                //{
+                //    Console.WriteLine("BinaryWriter");
+                //    _dsf.ToBytes().ToList().ForEach(item => Console.Write(string.Format("{0:X} ", item)));
+                //    Console.WriteLine();
+                //}
             }
             else
             {

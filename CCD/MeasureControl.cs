@@ -266,8 +266,10 @@ namespace CCD
         }
         public void Monitor(object sender, System.Timers.ElapsedEventArgs e)
         {
-            _gc.CheckAlMenosUnaBombaActiva();
-
+            if (DateTime.Now.Second == 0 && DateTime.Now.Minute % 3 == 0)
+            {
+                _gc.CheckAlMenosUnaBombaActiva();
+            }
             if (!_meter.Status)
             {
                 if (_cuentaMedidorSinConexion >= _medidorTimeOut)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CCD;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,9 +27,7 @@ namespace MonitorMedidor
 
             //CCD.DDS238.TestConver(bb);
 
-            CCD.DDS238 d = new CCD.DDS238(true, null, "192.168.0.221", 8899, true,false);
-           
-
+            CCD.DDS238 d = new CCD.DDS238(true, null, "192.168.0.221", 8899, true, false);
             Console.ReadKey();
         }
     }

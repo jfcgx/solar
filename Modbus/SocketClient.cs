@@ -127,19 +127,19 @@ namespace ModBus
                          */
 
                         // Detect if client disconnected
-                        //if (_tcpClient.Client.Poll(0, SelectMode.SelectRead))
-                        //{
-                        //    byte[] buff = new byte[1];
-                        //    if (_tcpClient.Client.Receive(buff, SocketFlags.Peek) == 0)
-                        //    {
-                        //        // Client disconnected
-                        //        return false;
-                        //    }
-                        //    else
-                        //    {
-                        //        return true;
-                        //    }
-                        //}
+                        if (_tcpClient.Client.Poll(1, SelectMode.SelectRead))
+                        {
+                            byte[] buff = new byte[1];
+                            if (_tcpClient.Client.Receive(buff, SocketFlags.Peek) == 0)
+                            {
+                                // Client disconnected
+                                return false;
+                            }
+                            else
+                            {
+                                return true;
+                            }
+                        }
 
                         return true;
                     }
@@ -194,12 +194,12 @@ namespace ModBus
                         _esActivo = true;
                         esExito = true;
                         _thread.Start();
-                        if (_timer == null)
-                        {
+                        //if (_timer == null)
+                        //{
                             _timer = new System.Timers.Timer(3000);
                             _timer.Elapsed += RevisarConexion;
                             _timer.Start();
-                        }
+                        //}
                         Connect?.Invoke(this, null);
                     }
                 }
@@ -335,7 +335,7 @@ namespace ModBus
 
                 OnDisconnect(EventArgs.Empty);
 
-                _timer.Close();
+                if(_timer!=null) _timer.Close();
 
                 if (_tcpClient != null)
                 {
