@@ -198,6 +198,12 @@ namespace CCD
                             #endregion
 
                             _potenciaExcedente = _cargaTotal - potenciaActiva;
+
+                            if (_dispositivos.First(p => p.Nombre.Equals("Filtro")).Estado && Meteo.NebulizadorActivo && _consumoActual >= 400 && _consumoActual <= 550)
+                            {
+                                _potenciaExcedente = _potenciaExcedente + 400;
+                            }
+
                             Console.WriteLine("_potenciaExcedente  {0} = _cargaTotal {1} - potenciaActiva {2}", _potenciaExcedente, _cargaTotal, potenciaActiva);
 
                             _potenciaExcedente = _potenciaExcedente < 0 ? 0 : _potenciaExcedente;
@@ -210,49 +216,55 @@ namespace CCD
                             Console.ResetColor();
 
                             // aqui controlare ademas las bombas de riego
+                            #region inestable aún para maneter los estaods
                             if (!_cargaManual)
                             {
-                                if (potenciaInversor < 550) //conmuta bombas prendido el termo// p
+                                if (potenciaInversor < 550) //conmuta bombas potencia baja
                                 {
-                                    if (!_dispositivos.First(p => p.Nombre.Equals("Bomba01")).Estado)
-                                    {
-                                        Console.ForegroundColor = ConsoleColor.Red;
-                                        Console.WriteLine("Potencia Inversor Baja   :{0}  conmuta a bomba 1", potenciaInversor);
-                                        Console.ResetColor();
-                                        _bomba01ComoCarga = false;
-                                        _dispositivos.First(p => p.Nombre.Equals("Bomba01")).CambiaEstado(true);
-                                    }
-                                    if (_dispositivos.First(p => p.Nombre.Equals("Bomba02")).Estado)
-                                    {
-                                        Thread.Sleep(2000);
-                                        _dispositivos.First(p => p.Nombre.Equals("Bomba02")).CambiaEstado(false);
-                                    }
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine("Potencia Inversor Baja   :{0}  conmuta a bomba 1", potenciaInversor);
+                                    Console.ResetColor();
+                                    _bomba01ComoCarga = false;
+                                    _dispositivos.First(p => p.Nombre.Equals("Bomba01")).CambiaEstado(true);
+                                    Thread.Sleep(2000);
+                                    _dispositivos.First(p => p.Nombre.Equals("Bomba02")).CambiaEstado(false);
                                 }
-                                else if (_consumoActual > 1500 && _cargaTotal < 30) //conmuta bombas prendido el termo
+                                else if (_consumoActual > 2000 && _cargaTotal < 30) //conmuta bombas prendido el termo mod: _consumoActual > 1500
                                 {
-                                    if (_dispositivos.First(p => p.Nombre.Equals("Bomba02")).Estado)
-                                    {
-                                        Console.ForegroundColor = ConsoleColor.Red;
-                                        Console.WriteLine("Potencia Inversor Baja   :{0}  conmuta a bomba 1", potenciaInversor);
-                                        Console.ResetColor();
-                                        _bomba01ComoCarga = false;
-                                        _dispositivos.First(p => p.Nombre.Equals("Bomba01")).CambiaEstado(true);
-                                        Thread.Sleep(2000);
-                                        _dispositivos.First(p => p.Nombre.Equals("Bomba02")).CambiaEstado(false);
-                                    }
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine("Potencia Inversor Baja   :{0}  conmuta a bomba 1", potenciaInversor);
+                                    Console.ResetColor();
+                                    _bomba01ComoCarga = false;
+                                    _dispositivos.First(p => p.Nombre.Equals("Bomba01")).CambiaEstado(true);
+                                    Thread.Sleep(2000);
+                                    _dispositivos.First(p => p.Nombre.Equals("Bomba02")).CambiaEstado(false);
+                                }
+                                else if (Meteo.NebulizadorActivo)
+                                {
+                                    _bomba01ComoCarga = false;
+                                    _dispositivos.First(p => p.Nombre.Equals("Bomba01")).Bloqueo = true;
+
+                                    _dispositivos.First(p => p.Nombre.Equals("Bomba02")).CambiaEstado(true);
+                                    Thread.Sleep(2000);
+                                    _dispositivos.First(p => p.Nombre.Equals("Bomba01")).CambiaEstado(false);
+
                                 }
                                 else if (potenciaActiva < -200)
                                 {
                                     _bomba01ComoCarga = true;
                                     _dispositivos.First(p => p.Nombre.Equals("Bomba02")).CambiaEstado(true);
+                                    Thread.Sleep(2000);
+                                    _dispositivos.First(p => p.Nombre.Equals("Bomba01")).CambiaEstado(true);
                                 }
                                 else if (_dispositivos.First(p => p.Nombre.Equals("Filtro")).Estado)
                                 {
                                     _bomba01ComoCarga = true;
                                 }
-
                                 _dispositivos.First(p => p.Nombre.Equals("Bomba01")).Bloqueo = _bomba01ComoCarga ? false : true;
                             }
+                            #endregion
+
+
 
                             if (_potenciaExcedente > 0)
                             {

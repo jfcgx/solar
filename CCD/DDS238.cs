@@ -36,7 +36,7 @@ namespace CCD
 
         SocketServer _serverLog = new SocketServer();
         bool _status;
-        SocketClient _clientRs;
+        SuperSocketClient _clientRs;
         System.IO.StreamWriter _t;
         System.IO.StreamWriter _f;
         System.Timers.Timer _timer = new System.Timers.Timer();
@@ -191,7 +191,7 @@ namespace CCD
             }
             else
             {
-                _clientRs = new SocketClient(ip, puerto);
+                _clientRs = new SuperSocketClient(ip, puerto);
                 _clientRs.InputData += clientRs_InputData;
                 _status = _clientRs.IniciarSocket();
 

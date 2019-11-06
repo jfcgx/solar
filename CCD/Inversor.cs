@@ -35,7 +35,7 @@ namespace CCD
         bool _esSocket;
         bool _muestraDatosConsola;
         bool _status;
-        SocketClient _clientRs;
+        SuperSocketClient _clientRs;
         string _ip;
         int _puerto;
 
@@ -74,7 +74,7 @@ namespace CCD
                 }
                 else
                 {
-                    _clientRs = new SocketClient(Ip, Puerto);
+                    _clientRs = new SuperSocketClient(Ip, Puerto);
                     _status = _clientRs.IniciarSocket();
                     _clientRs.InputData += clientRs_InputData;
 
@@ -222,11 +222,14 @@ namespace CCD
                 Console.WriteLine("Inversor Timeout");
                 _cuentaTimeOutParaReiniciarElSocket++;
 
+
+
                 if (_cuentaTimeOutParaReiniciarElSocket >= _maxTimeOutReinicioSocket)
                 {
                     _cuentaTimeOutParaReiniciarElSocket = 0;
                     _clientRs.TerminaSocket();
                     _clientRs.IniciarSocket();
+                    _inverter_stat.pv_dc_voltage = 0;
                 }
             }
             else

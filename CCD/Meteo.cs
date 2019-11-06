@@ -13,9 +13,13 @@ namespace CCD
      
         System.IO.StreamWriter _fileLog;
         Termometro _termometro;
+        static bool _nebulizadorActivo;
+        bool _primeraLectura = true;
 
         System.Timers.Timer _timer;
         public System.Timers.Timer Timer { get => _timer; set => _timer = value; }
+        public static bool NebulizadorActivo { get => _nebulizadorActivo; set => _nebulizadorActivo = value; }
+
         public Meteo()
         {        
 
@@ -23,16 +27,16 @@ namespace CCD
         }
         private void timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            if (DateTime.Now.Second == 0 && DateTime.Now.Minute % 5 == 0)
+            if (DateTime.Now.Second == 0 && DateTime.Now.Minute % 5 == 0 || _primeraLectura)
             {
                 _fileLog.WriteLine("{0};{1:0.00};{2:0.00}", DateTime.Now.ToString(), _termometro.Temperatura, _termometro.Humedad);
                 _fileLog.Flush();
 
                 _termometro.Dispositivo.Manual = false;
-                if (_termometro.Humedad < 65 && _termometro.Temperatura > 27)
+                if (_termometro.Humedad < 50 && _termometro.Temperatura > 27)
                 {
                     _termometro.Dispositivo.CambiaEstado(true);
-
+                    _nebulizadorActivo = true;
                     Console.ForegroundColor = ConsoleColor.DarkRed;
                     Console.WriteLine("Enciende Nebulizador");
                     Console.ResetColor();
@@ -40,9 +44,11 @@ namespace CCD
                 else
                 {
                     _termometro.Dispositivo.CambiaEstado(false);
+                    _nebulizadorActivo = false;
                 }
 
             }
+            _primeraLectura = false;
         }
 
         public void Inicia()

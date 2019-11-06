@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace ModBus
 {
-    public class SocketClient
+    public class SocketClientOld
     {
         #region const
         int readTimeOut = 2000;
@@ -80,7 +80,7 @@ namespace ModBus
             }
         }
         #endregion
-        public SocketClient(string ip, int puerto)
+        public SocketClientOld(string ip, int puerto)
         {
             Puerto = puerto;
             Ip = ip;
