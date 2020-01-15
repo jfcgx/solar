@@ -30,7 +30,7 @@ namespace CCD
 
         public void IniciaLectura()
         {
-            Dispositivo = new Dispositivo("Termometro", EnumTipoCarga.Termo, 0, 0, string.Empty, 1, "192.168.0.49", ConnectionType.tasmota, ModuleType.TH, "1",true);
+            Dispositivo = new Dispositivo("Termometro", EnumTipoCarga.Termo, 0, 0, string.Empty, 1, "192.168.0.49", ConnectionType.tasmota, ModuleType.TH, "1");
 
             _lecturaHumedad = new List<double>();
             _lecturaTemperatura = new List<double>();

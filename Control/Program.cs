@@ -1,34 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using CCD;
+using System;
 using System.ServiceModel;
 using System.ServiceModel.Description;
-using System.Text;
-using System.Threading.Tasks;
-using CCD;
 
-namespace ControlCargaDinamica
+namespace Control
 {
     class Program
     {
-        
         public static MeasureControl process;
         public static ServiceHost host;
 
-        
+
         static void Main(string[] args)
         {
             process = MeasureControl.GetInstance();
-            
             process.Inicia();
             IniciaWS();
         }
-
         public static void IniciaWS()
         {
             try
             {
-                Uri baseAddress = new Uri(string.Format("http://{0}:2480/{1}", "127.0.0.1","grid"));
+                Uri baseAddress = new Uri(string.Format("http://{0}:2480/{1}", "127.0.0.1", "grid"));
 
 
                 host = new ServiceHost(typeof(MeasureControl), baseAddress);

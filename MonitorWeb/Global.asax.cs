@@ -62,7 +62,7 @@ namespace MonitorWeb
                     SeedData.Add(estado);
                     Application["BoardDatabase"] = SeedData;
 
-                    estadoTemp = measureControl.GetEstado("Bomba01");
+                    estadoTemp = measureControl.GetEstado("LedRio");
                     if (_estadoB1 != estadoTemp)
                         _cambio = true;
                     _estadoB1 = estadoTemp;

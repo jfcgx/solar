@@ -159,13 +159,16 @@ namespace Resumen
 
                     inicioCicloAnterior = DateTime.Now;
                     finCicloAnterior = DateTime.Parse(inicioCicloAnterior.ToString("yyyy") + '-' + inicioCicloAnterior.ToString("MM") + '-' + diaFin).AddMonths(-1);
-                    inicioCicloAnterior = DateTime.Parse(inicioCicloAnterior.ToString("yyyy") + '-' + inicioCicloAnterior.AddMonths(-2).ToString("MM") + '-' + diaIni);
+                    inicioCicloAnterior = DateTime.Parse(finCicloAnterior.ToString("yyyy") + '-' + inicioCicloAnterior.AddMonths(-2).ToString("MM") + '-' + diaIni);
                 }
                 else
                 {
                     inicioCicloAnterior = DateTime.Now;
                     finCicloAnterior = DateTime.Parse(inicioCicloAnterior.ToString("yyyy") + '-' + inicioCicloAnterior.ToString("MM") + '-' + diaFin);
-                    inicioCicloAnterior = DateTime.Parse(inicioCicloAnterior.ToString("yyyy") + '-' + inicioCicloAnterior.AddMonths(-1).ToString("MM") + '-' + diaIni);
+
+                    inicioCicloAnterior = finCicloAnterior.AddMonths(-1);
+
+                    inicioCicloAnterior = DateTime.Parse(inicioCicloAnterior.ToString("yyyy") + '-' + inicioCicloAnterior.ToString("MM") + '-' + diaIni);
                 }
                 double Exportado = 0;
                 double Importado = 0;

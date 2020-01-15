@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Field", "Field\Field.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Meteo", "Meteo\Meteo.csproj", "{C4F98C03-1503-43A1-8327-3FB65285162B}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Control", "Control\Control.csproj", "{9D31C6BD-BC1B-4D2D-B8B3-A115CA6BEAD6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{C4F98C03-1503-43A1-8327-3FB65285162B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4F98C03-1503-43A1-8327-3FB65285162B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C4F98C03-1503-43A1-8327-3FB65285162B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D31C6BD-BC1B-4D2D-B8B3-A115CA6BEAD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D31C6BD-BC1B-4D2D-B8B3-A115CA6BEAD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D31C6BD-BC1B-4D2D-B8B3-A115CA6BEAD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D31C6BD-BC1B-4D2D-B8B3-A115CA6BEAD6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

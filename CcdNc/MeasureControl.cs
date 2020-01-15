@@ -67,8 +67,6 @@ namespace CCD
         private int _medidorTimeOut = 120;
         private bool _bloqueoCierrePorTimeOut;
 
-        public static GestionCarga Gc { get => _gc; set => _gc = value; }
-
         public static MeasureControl GetInstance()
         {
             if (instance == null)
@@ -91,7 +89,6 @@ namespace CCD
 
             FinalizarInstanciaPrevia();
             Thread.Sleep(3000);
-
 
             _serverLog = new SocketServer();
             _logTemp = string.Empty;
@@ -137,7 +134,7 @@ namespace CCD
                     _gc.Dispositivos.Find(p => p.Nombre.Equals("LedPileta")).Estado = (bool.Parse(estados[6]));
                     _gc.Dispositivos.Find(p => p.Nombre.Equals("LedTablero")).Estado = (bool.Parse(estados[7]));
                     _gc.Dispositivos.Find(p => p.Nombre.Equals("Filtro")).Estado = (bool.Parse(estados[8]));
-                    _gc.Dispositivos.Find(p => p.Nombre.Equals("LedRio")).Estado = (bool.Parse(estados[10]));
+                    _gc.Dispositivos.Find(p => p.Nombre.Equals("Bomba01")).Estado = (bool.Parse(estados[9]));
                     _gc.Dispositivos.Find(p => p.Nombre.Equals("Bomba02")).Estado = (bool.Parse(estados[10]));
                     // (DateTime.Parse(estados[11]));
                     _initExportkWh = (double.Parse(estados[12]));
@@ -235,7 +232,7 @@ namespace CCD
         {
 
             #region Reinicia App cada 24 hora
-            if ( DateTime.Now.Minute == 0 && DateTime.Now.Second == 0) // DateTime.Now.Hour == 0 && cada 24 hora
+            if (DateTime.Now.Hour == 0 && DateTime.Now.Minute == 0 && DateTime.Now.Second == 0) // cada 24 hora
             {
                 _isBusy = true;
 
@@ -260,8 +257,7 @@ namespace CCD
         }
         public void ReiniciaApp()
         {
-            _gc.Dispositivos.First(p => p.Nombre.Equals("medidor")).CambiaEstado(false);
-            Thread.Sleep(5000);
+
             Process cmd = new Process();
             cmd.StartInfo.FileName = _nombreProceso + @".exe";
             cmd.StartInfo.WorkingDirectory = Environment.CurrentDirectory;
@@ -340,7 +336,7 @@ namespace CCD
                             {
 
                                 EscribeLog(_inverter.bs_inverter_print_stats());
-                                if (_inverter.Inverter_stat.pv_watt > 0)
+                                if (_inverter.Inverter_stat.pv_dc_voltage > 100)
                                 {
                                     _gc.MantieneEstado(true);
 
@@ -480,7 +476,7 @@ namespace CCD
                     _gc.Dispositivos.Find(p => p.Nombre.Equals("LedPileta")).Estado,
                     _gc.Dispositivos.Find(p => p.Nombre.Equals("LedTablero")).Estado,
                     _gc.Dispositivos.Find(p => p.Nombre.Equals("Filtro")).Estado,
-                    _gc.Dispositivos.Find(p => p.Nombre.Equals("LedRio")).Estado,
+                    _gc.Dispositivos.Find(p => p.Nombre.Equals("Bomba01")).Estado,
                     _gc.Dispositivos.Find(p => p.Nombre.Equals("Bomba02")).Estado,
                     _today,
                     _initExportkWh,

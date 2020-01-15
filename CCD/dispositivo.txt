@@ -1,0 +1,10 @@
+Termo,Luz,1500,2,Termo,0,,ifttt,Basic,cQI0Xpm6oE-DVC8ezLnwHs,false
+AmbarInvernadero,Luz,150,1,AmbarInvernadero,3,,ifttt,Basic,cQI0Xpm6oE-DVC8ezLnwHs,false
+AmbarTablero,Luz,100,1,l03ambar,3,,ifttt,Basic,cQI0Xpm6oE-DVC8ezLnwHs,false
+AmbarPileta,Luz,100,1,l02ambar,3,,ifttt,Basic,cQI0Xpm6oE-DVC8ezLnwHs,false
+LedPileta,Luz,30,1,l01led,5,,ifttt,Basic,cQI0Xpm6oE-DVC8ezLnwHs,false
+LedTablero,Luz,100,1,l02led,5,,ifttt,Basic,cQI0Xpm6oE-DVC8ezLnwHs,false
+Filtro,Filtro,1000,1,filtro_piscina,2,192.168.0.52,tasmota,Basic,1,false
+LedRio,Led,70,1,LedRio,2,192.168.0.50,tasmota,Dual,1,false
+Bomba02,BombaRiego,1500,2,bomba02,2,192.168.0.50,tasmota,Dual,2,true
+medidor,Filtro,1000,1,medidor,2,192.168.0.51,tasmota,Basic,1,true

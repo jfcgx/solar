@@ -71,7 +71,7 @@ namespace MonitorWeb
         protected void Button1_Click(object sender, EventArgs e)
         {
 
-            Global.measureControl.SetEstado("Bomba01", !Global._estadoB1);
+            Global.measureControl.SetEstado("LedRio", !Global._estadoB1);
             Button1.Text = !Global._estadoB1 ? "ON" : "OFF"; ;
 
 

@@ -26,13 +26,14 @@ namespace CCD
         private int _consumoActual;
         private int _countEsperaIncremento;
         private bool _mantieneEstado;
+        private bool _bomba01ComoCarga;
         public bool BombaManual
         {
             get => _cargaManual;
             set
             {
                 _cargaManual = value;
-
+                _dispositivos.FirstOrDefault(p => p.Nombre.Equals("Bomba01")).Manual = value;
                 _dispositivos.FirstOrDefault(p => p.Nombre.Equals("Bomba02")).Manual = value;
                 _dispositivos.FirstOrDefault(p => p.Nombre.Equals("Filtro")).Manual = value;
             }
@@ -56,59 +57,25 @@ namespace CCD
             _mantieneEstado = true;
             _dispositivos = new List<Dispositivo>();
 
-            List<string> dispositivos = System.IO.File.ReadAllLines("dispositivo.txt").ToList();
+            Dispositivo AmbarTablero = new Dispositivo("AmbarTablero", EnumTipoCarga.Luz, 100, 1, "l03ambar", 3, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
+            Dispositivo AmbarPileta = new Dispositivo("AmbarPileta", EnumTipoCarga.Luz, 100, 1, "l02ambar", 3, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
+            Dispositivo LedPileta = new Dispositivo("LedPileta", EnumTipoCarga.Luz, 30, 1, "l01led", 5, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
+            Dispositivo LedTablero = new Dispositivo("LedTablero", EnumTipoCarga.Luz, 100, 1, "l02led", 5, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY); //porque tenia 100?
+            Dispositivo Filtro = new Dispositivo("Filtro", EnumTipoCarga.Filtro, 1000, 1, "filtro_piscina", 2, "192.168.0.52", ConnectionType.tasmota, ModuleType.Basic, "1");
+            Dispositivo Bomba01 = new Dispositivo("Bomba01", EnumTipoCarga.BombaAux, 400, 1, "bomba01", 2, "192.168.0.50", ConnectionType.tasmota, ModuleType.Dual, "1");//0,37kw segun mANUL
+            Dispositivo Bomba02 = new Dispositivo("Bomba02", EnumTipoCarga.BombaRiego, 800, 2, "bomba02", 2, "192.168.0.50", ConnectionType.tasmota, ModuleType.Dual, "2");
 
-            foreach (var item in dispositivos)
-            {
-                var v = item.Split(',').ToList();
+            _dispositivos.Add(AmbarTablero);
+            _dispositivos.Add(AmbarPileta);
+            _dispositivos.Add(LedPileta);
+            _dispositivos.Add(LedTablero);
+            _dispositivos.Add(Filtro);
+            _dispositivos.Add(Bomba01);
+            _dispositivos.Add(Bomba02);
 
-                Dispositivo dispositivo = new Dispositivo(
-                    v[0],
-                    (EnumTipoCarga)Enum.Parse(typeof(EnumTipoCarga), v[1]),
-                    int.Parse(v[2]),
-                    int.Parse(v[3]),
-                    v[4],
-                    double.Parse(v[5]),
-                    v[6],
-                    (ConnectionType)Enum.Parse(typeof(ConnectionType), v[7]),
-                     (ModuleType)Enum.Parse(typeof(ModuleType), v[8]),
-                    v[9],
-                    bool.Parse( v[10])
-                    );
+            _dispositivos.First(p => p.Nombre.Equals("Bomba02")).Bloqueo = true;
 
-                _dispositivos.Add(dispositivo);
-            }
-
-
-            //Dispositivo Termo = new Dispositivo("Termo", EnumTipoCarga.Luz, 1500, 2, "Termo", 0, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
-            //Dispositivo AmbarInvernadero = new Dispositivo("AmbarInvernadero", EnumTipoCarga.Luz, 150, 1, "AmbarInvernadero", 3, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
-            //Dispositivo AmbarTablero = new Dispositivo("AmbarTablero", EnumTipoCarga.Luz, 100, 1, "l03ambar", 3, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
-            //Dispositivo AmbarPileta = new Dispositivo("AmbarPileta", EnumTipoCarga.Luz, 100, 1, "l02ambar", 3, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
-            //Dispositivo LedPileta = new Dispositivo("LedPileta", EnumTipoCarga.Luz, 30, 1, "l01led", 5, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
-            //Dispositivo LedTablero = new Dispositivo("LedTablero", EnumTipoCarga.Luz, 100, 1, "l02led", 5, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY); //porque tenia 100?
-            //Dispositivo Filtro = new Dispositivo("Filtro", EnumTipoCarga.Filtro, 1000, 1, "filtro_piscina", 2, "192.168.0.52", ConnectionType.tasmota, ModuleType.Basic, "1");
-            //Dispositivo LedRio = new Dispositivo("LedRio", EnumTipoCarga.Led, 70, 1, "LedRio", 2, "192.168.0.50", ConnectionType.tasmota, ModuleType.Dual, "1");//0,37kw segun mANUL
-            //Dispositivo Bomba02 = new Dispositivo("Bomba02", EnumTipoCarga.BombaRiego, 1500, 2, "bomba02", 2, "192.168.0.50", ConnectionType.tasmota, ModuleType.Dual, "2");
-            //Dispositivo medidor = new Dispositivo("medidor", EnumTipoCarga.Filtro, 1000, 1, "medidor", 2, "192.168.0.51", ConnectionType.tasmota, ModuleType.Basic, "1");
-
-
-            //_dispositivos.Add(Termo);
-            //_dispositivos.Add(AmbarInvernadero);
-            //_dispositivos.Add(AmbarTablero);
-            //_dispositivos.Add(AmbarPileta);
-            //_dispositivos.Add(LedPileta);
-            //_dispositivos.Add(LedTablero);
-            //_dispositivos.Add(Filtro);
-            //_dispositivos.Add(LedRio);
-            //_dispositivos.Add(Bomba02);
-            //_dispositivos.Add(medidor);
-
-            //_dispositivos.First(p => p.Nombre.Equals("Bomba02")).Bloqueo = true;
-
-            //_dispositivos.First(p => p.Nombre.Equals("medidor")).Bloqueo = true;
-
-            _dispositivos.First(p => p.Nombre.Equals("medidor")).CambiaEstado(true);
-            Thread.Sleep(3000);
+            _dispositivos.First(p => p.Nombre.Equals("Bomba01")).Bloqueo = true;
         }
         
         public bool SetEstado(string nombre, bool valor)
@@ -147,7 +114,7 @@ namespace CCD
         {
             bool activo = false;
             var dd = from cust in _dispositivos
-                     where cust.Estado && !(cust.Nombre.Equals("Bomba02"))
+                     where cust.Estado && !(cust.Nombre.Equals("Bomba01") || cust.Nombre.Equals("Bomba02"))
                      select cust;
 
             activo = dd.Count() > 0;
@@ -183,12 +150,19 @@ namespace CCD
         public void CheckAlMenosUnaBombaActiva()
         {
 
-            if (!_dispositivos.First(p => p.Nombre.Equals("Bomba02")).Estado)
+            if (!_dispositivos.First(p => p.Nombre.Equals("Bomba01")).Estado && !_dispositivos.First(p => p.Nombre.Equals("Bomba02")).Estado)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("!!!!!!!!!!! Ninguna bomba activa!!!!!!!!!!!!!!!!!!!");
+                Console.WriteLine("!!!!!!!!!!! Ninguna bomba activa conmuta a Bomba01 !!!!!!!!!!!!!!!!!!!");
                 Console.ResetColor();
-                _dispositivos.First(p => p.Nombre.Equals("Bomba02")).CambiaEstado(true);
+
+                _bomba01ComoCarga = false;
+
+                _dispositivos.First(p => p.Nombre.Equals("Bomba01")).Bloqueo = true;
+
+                _dispositivos.First(p => p.Nombre.Equals("Bomba01")).CambiaEstado(true);
+                Thread.Sleep(2000);
+                _dispositivos.First(p => p.Nombre.Equals("Bomba02")).CambiaEstado(false);
             }
         }
         public string Consume(int potenciaActiva, int potenciaInversor)
@@ -248,6 +222,8 @@ namespace CCD
                                         Console.ForegroundColor = ConsoleColor.Red;
                                         Console.WriteLine("Potencia Inversor Baja   :{0}  conmuta a bomba 1", potenciaInversor);
                                         Console.ResetColor();
+                                        _bomba01ComoCarga = false;
+                                        _dispositivos.First(p => p.Nombre.Equals("Bomba01")).CambiaEstado(true);
                                         Thread.Sleep(2000);
                                         _dispositivos.First(p => p.Nombre.Equals("Bomba02")).CambiaEstado(false);
                                     }
@@ -256,17 +232,33 @@ namespace CCD
                                         Console.ForegroundColor = ConsoleColor.Red;
                                         Console.WriteLine("Potencia Inversor Baja   :{0}  conmuta a bomba 1", potenciaInversor);
                                         Console.ResetColor();
+                                        _bomba01ComoCarga = false;
+                                        _dispositivos.First(p => p.Nombre.Equals("Bomba01")).CambiaEstado(true);
                                         Thread.Sleep(2000);
                                         _dispositivos.First(p => p.Nombre.Equals("Bomba02")).CambiaEstado(false);
                                     }
                                     else if (Meteo.NebulizadorActivo)
                                     {
+                                        _bomba01ComoCarga = false;
+                                        _dispositivos.First(p => p.Nombre.Equals("Bomba01")).Bloqueo = true;
+
                                         _dispositivos.First(p => p.Nombre.Equals("Bomba02")).CambiaEstado(true);
+                                        Thread.Sleep(2000);
+                                        _dispositivos.First(p => p.Nombre.Equals("Bomba01")).CambiaEstado(false);
+
                                     }
                                     else if (potenciaActiva < -200)
                                     {
+                                        _bomba01ComoCarga = true;
                                         _dispositivos.First(p => p.Nombre.Equals("Bomba02")).CambiaEstado(true);
+                                        Thread.Sleep(2000);
+                                        _dispositivos.First(p => p.Nombre.Equals("Bomba01")).CambiaEstado(true);
                                     }
+                                    else if (_dispositivos.First(p => p.Nombre.Equals("Filtro")).Estado)
+                                    {
+                                        _bomba01ComoCarga = true;
+                                    }
+                                    _dispositivos.First(p => p.Nombre.Equals("Bomba01")).Bloqueo = _bomba01ComoCarga ? false : true;
                                 }
                             }
                             else
@@ -308,18 +300,17 @@ namespace CCD
                     }
 
                     _cargaTotal = 0;
-                    
-                    //_cargaTotal += _dispositivos.First(p => p.Nombre.Equals("Termo")).Estado ? _dispositivos.First(p => p.Nombre.Equals("Termo")).PowerConsumption : 0;
-                    //_cargaTotal += _dispositivos.First(p => p.Nombre.Equals("AmbarInvernadero")).Estado ? _dispositivos.First(p => p.Nombre.Equals("AmbarInvernadero")).PowerConsumption : 0;
-                    //_cargaTotal += _dispositivos.First(p => p.Nombre.Equals("LedRio")).Estado ? _dispositivos.First(p => p.Nombre.Equals("LedRio")).PowerConsumption : 0;
-                    //_cargaTotal += _dispositivos.First(p => p.Nombre.Equals("LedPileta")).Estado ? _dispositivos.First(p => p.Nombre.Equals("LedPileta")).PowerConsumption : 0;
-                    //_cargaTotal += _dispositivos.First(p => p.Nombre.Equals("LedTablero")).Estado ? _dispositivos.First(p => p.Nombre.Equals("LedTablero")).PowerConsumption : 0;
-                    //_cargaTotal += _dispositivos.First(p => p.Nombre.Equals("AmbarTablero")).Estado ? _dispositivos.First(p => p.Nombre.Equals("AmbarTablero")).PowerConsumption : 0;
-                    //_cargaTotal += _dispositivos.First(p => p.Nombre.Equals("AmbarPileta")).Estado ? _dispositivos.First(p => p.Nombre.Equals("AmbarPileta")).PowerConsumption : 0;
-                    //_cargaTotal += _dispositivos.First(p => p.Nombre.Equals("Filtro")).Estado ? _dispositivos.First(p => p.Nombre.Equals("Filtro")).PowerConsumption : 0;
 
 
-                    _cargaTotal = _dispositivos.Where(a => !a.Bloqueo).Where(b=>b.Estado).Sum(p => p.PowerConsumption);
+                    //_cargaTotal = _dispositivos.Where(p => p.TipoCarga != EnumTipoCarga.BombaRiego).Where(p => p.Estado).Sum(s => s.PowerConsumption);
+                    //if (_bomba01ComoCarga) _cargaTotal += _dispositivos.Where(p => p.TipoCarga != EnumTipoCarga.BombaAux).FirstOrDefault().Estado ? _dispositivos.Where(p => p.TipoCarga != EnumTipoCarga.BombaAux).FirstOrDefault().PowerConsumption : 0;
+
+                    _cargaTotal += _dispositivos.First(p => p.Nombre.Equals("LedPileta")).Estado ? _dispositivos.First(p => p.Nombre.Equals("LedPileta")).PowerConsumption : 0;
+                    _cargaTotal += _dispositivos.First(p => p.Nombre.Equals("LedTablero")).Estado ? _dispositivos.First(p => p.Nombre.Equals("LedTablero")).PowerConsumption : 0;
+                    _cargaTotal += _dispositivos.First(p => p.Nombre.Equals("AmbarTablero")).Estado ? _dispositivos.First(p => p.Nombre.Equals("AmbarTablero")).PowerConsumption : 0;
+                    _cargaTotal += _dispositivos.First(p => p.Nombre.Equals("AmbarPileta")).Estado ? _dispositivos.First(p => p.Nombre.Equals("AmbarPileta")).PowerConsumption : 0;
+                    _cargaTotal += _dispositivos.First(p => p.Nombre.Equals("Filtro")).Estado ? _dispositivos.First(p => p.Nombre.Equals("Filtro")).PowerConsumption : 0;
+                    if (_bomba01ComoCarga) _cargaTotal += _dispositivos.First(p => p.Nombre.Equals("Bomba01")).Estado ? _dispositivos.First(p => p.Nombre.Equals("Bomba01")).PowerConsumption : 0;
 
                     foreach (var d in _dispositivos)
                     {
@@ -327,6 +318,7 @@ namespace CCD
                     }
 
                     sb.Append(Environment.NewLine);
+                    sb.AppendFormat("Bomba 01 como carga :{0}{1}", _bomba01ComoCarga, Environment.NewLine);
                     sb.AppendFormat("Carga Manual        :{0}{1}", _cargaManual, Environment.NewLine);
                     sb.AppendFormat("Potencia Inversor   :{0}{1}", potenciaInversor, Environment.NewLine);
                     sb.AppendFormat("Consumo Actual      :{0}{1}", _consumoActual, Environment.NewLine);

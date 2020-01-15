@@ -31,13 +31,13 @@
             <td colspan="2" style="height: 20px">BOMBAS</td>
         </tr>
         <tr>
-            <td style="width: 89px">Riego 1</td>
+            <td style="width: 89px">Led Rio</td>
             <td style="width: 312px">
                 <asp:Button ID="Button1" runat="server" OnClick="Button1_Click" Text="Toggle" />
             </td>
         </tr>
         <tr>
-            <td style="width: 89px">Riego 2</td>
+            <td style="width: 89px">Riego</td>
             <td style="width: 312px">
                 <asp:Button ID="Button2" runat="server" OnClick="Button2_Click" Text="Toggle" />
             </td>

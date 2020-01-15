@@ -289,7 +289,7 @@ namespace CCD
         public Dispositivo()
         {
         }
-        public Dispositivo(string nombre, EnumTipoCarga tipoCarga, int powerConsumption, int ponderacion, string trigger, double interval, string ip, ConnectionType connection, ModuleType moduleType, string key, bool bloqueo)
+        public Dispositivo(string nombre, EnumTipoCarga tipoCarga, int powerConsumption, int ponderacion, string trigger, double interval, string ip, ConnectionType connection, ModuleType moduleType, string key)
         {
             _tipoCarga = tipoCarga;
             _moduleType = moduleType;
@@ -300,7 +300,6 @@ namespace CCD
             this.Nombre = nombre;
             this.PowerConsumption = powerConsumption;
             this.Trigger = trigger;
-            _bloqueo = bloqueo;
 
             if (connection != ConnectionType.ifttt)
             {
