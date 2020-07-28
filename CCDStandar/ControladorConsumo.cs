@@ -1,28 +1,15 @@
-﻿using ModBus;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.ServiceModel;
+using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
-namespace CCD
+namespace CCDStandar
 {
-    [ServiceContract]
-    public interface IMeasureControl
-    {
-        [OperationContract]
-        bool SetEstado(string nombre, bool valor);
-        [OperationContract]
-        bool GetEstado(string nombre);
-        [OperationContract]
-        string GetLog();
-        [OperationContract]
-        string Resumen();
-        [OperationContract]
-        bool Manual(bool value);
-    }
-    public class MeasureControl : IMeasureControl
+    public class ControladorConsumo
     {
 
         Meteo _meteo;
@@ -35,8 +22,9 @@ namespace CCD
 
         double _initImportkWh;
         double _initExportkWh;
-
+        
         SocketServer _serverLog;
+
         System.IO.StreamWriter _fileLog;
         System.Timers.Timer _timer;
         System.Timers.Timer _timerMonitor;
@@ -58,25 +46,26 @@ namespace CCD
         public static string Log;
         private static GestionCarga _gc;
 
-        private static MeasureControl instance = null;
+        private static ControladorConsumo instance = null;
         private int _cuentaMedidorSinConexion = 0;
         private int _medidorTimeOut = 120;
         private bool _bloqueoCierrePorTimeOut;
-
+        public static string _path;
         public static GestionCarga Gc { get => _gc; set => _gc = value; }
 
-        public static MeasureControl GetInstance()
+        public static ControladorConsumo GetInstance(string dir)
         {
+            _path = dir;
             if (instance == null)
-                instance = new MeasureControl();
+                instance = new ControladorConsumo();
 
             return instance;
         }
-        private MeasureControl()
+        private ControladorConsumo()
         {
-
+            
         }
-        public void Inicia()
+        public void Inicia(List<string> dispositivos)
         {
             Process currentProcess = Process.GetCurrentProcess();
             _nombreProceso = currentProcess.ProcessName;
@@ -88,19 +77,18 @@ namespace CCD
             FinalizarInstanciaPrevia();
             Thread.Sleep(3000);
 
-
             _serverLog = new SocketServer();
+            //_serverLog.InputData += _serverLog_InputData;
+            _serverLog.Init(1234);
+
+
+
             _logTemp = string.Empty;
 
             _timerMonitor = new System.Timers.Timer();
             _timer = new System.Timers.Timer();
             _ultimaPotenciaInv = 0;
-            _gc = GestionCarga.GetInstance();
-            _gc.Inicia();
             //GridInverter.ApagarAviso();
-
-            _serverLog.InputData += _serverLog_InputData;
-            _serverLog.Init(1234);
 
 
             _timer.Interval = 1000;
@@ -110,36 +98,37 @@ namespace CCD
             //GridInverter.EncenderGrid();
 
 
-            string log = string.Format(@"log\log_{0}.txt", DateTime.Now.ToString("yyyyMMdd"));
-            _fileLog = System.IO.File.AppendText(log);
+            string log = string.Format(@"log_{0}.txt", DateTime.Now.ToString("yyyyMMdd"));
+            _fileLog = System.IO.File.AppendText(Path.Combine(_path, log));
 
-            var fi = new System.IO.FileInfo("est.txt");
+            
+            var fi = new System.IO.FileInfo(Path.Combine(_path, "est.txt"));
             _today = DateTime.Now.Date;
 
             #region Estado
             if (fi.Exists)
             {
                 try
-                {
-                    string ultimoEstado = System.IO.File.ReadAllText("est.txt");
+                {                    
+                    string ultimoEstado = System.IO.File.ReadAllText(Path.Combine(_path, "est.txt"));
                     var estados = ultimoEstado.Split(';');
 
                     _ultimaPotenciaInv = int.Parse(estados[0]);
                     _envioOrdenApagadoGrid = bool.Parse(estados[1]);
                     _envioAviso = bool.Parse(estados[2]);
                     _potenciaActiva = int.Parse(estados[3]);
-                    _gc.Dispositivos.Find(p => p.Nombre.Equals("AmbarTablero")).Estado = (bool.Parse(estados[4]));
-                    _gc.Dispositivos.Find(p => p.Nombre.Equals("AmbarPileta")).Estado = (bool.Parse(estados[5]));
-                    _gc.Dispositivos.Find(p => p.Nombre.Equals("LedPileta")).Estado = (bool.Parse(estados[6]));
-                    _gc.Dispositivos.Find(p => p.Nombre.Equals("LedTablero")).Estado = (bool.Parse(estados[7]));
-                    _gc.Dispositivos.Find(p => p.Nombre.Equals("Filtro")).Estado = (bool.Parse(estados[8]));
-                    _gc.Dispositivos.Find(p => p.Nombre.Equals("LedRio")).Estado = (bool.Parse(estados[10]));
-                    _gc.Dispositivos.Find(p => p.Nombre.Equals("Bomba02")).Estado = (bool.Parse(estados[10]));
+                    //_gc.Dispositivos.Find(p => p.Nombre.Equals("AmbarTablero")).Estado = (bool.Parse(estados[4]));
+                    //_gc.Dispositivos.Find(p => p.Nombre.Equals("AmbarPileta")).Estado = (bool.Parse(estados[5]));
+                    //_gc.Dispositivos.Find(p => p.Nombre.Equals("LedPileta")).Estado = (bool.Parse(estados[6]));
+                    //_gc.Dispositivos.Find(p => p.Nombre.Equals("LedTablero")).Estado = (bool.Parse(estados[7]));
+                    //_gc.Dispositivos.Find(p => p.Nombre.Equals("Filtro")).Estado = (bool.Parse(estados[8]));
+                    //_gc.Dispositivos.Find(p => p.Nombre.Equals("LedRio")).Estado = (bool.Parse(estados[10]));
+                    //_gc.Dispositivos.Find(p => p.Nombre.Equals("Bomba02")).Estado = (bool.Parse(estados[10]));
                     // (DateTime.Parse(estados[11]));
-                    _initExportkWh = (double.Parse(estados[12]));
-                    Console.WriteLine(_initExportkWh);
-                    _initImportkWh = (double.Parse(estados[13]));
-                    Console.WriteLine(_initImportkWh);
+                    _initExportkWh = (double.Parse(estados[5]));
+                    EscribeLog(_initExportkWh);
+                    _initImportkWh = (double.Parse(estados[6]));
+                    EscribeLog(_initImportkWh);
                 }
                 catch (Exception ex)
                 {
@@ -154,11 +143,11 @@ namespace CCD
                 if (_initExportkWh == 0 || _initImportkWh == 0)
                 {
 
-                    string meter = string.Format(@"log\log_meter_{0}.txt", DateTime.Now.AddDays(-1).ToString("yyyyMMdd"));
-                    var archivoLectura = new System.IO.FileInfo(meter);
+                    string meter = string.Format(@"log_meter_{0}.txt", DateTime.Now.AddDays(-1).ToString("yyyyMMdd"));
+                    var archivoLectura = new System.IO.FileInfo(Path.Combine(_path, meter));
                     if (archivoLectura.Exists)
                     {
-                        var f = System.IO.File.ReadLines(meter);
+                        var f = System.IO.File.ReadLines(Path.Combine(_path, meter));
                         string lineaUltimaLectura = f.Last();
 
                         var estados = lineaUltimaLectura.Split(';');
@@ -180,24 +169,15 @@ namespace CCD
 
             EscribeLog(log);
 
-            Console.Beep();
 
-            _inverter = new Inversor(true, false, "192.168.0.222", 8899);
+            _inverter = new Inversor(true, false, "192.168.100.4", 8899);//192.168.0.222
             _inverter.Inicia();
 
-            if (Properties.Settings.Default.MeterSocket)
-            {
-                var ip = Properties.Settings.Default.MeterIP.Split(':')[0];
-                var port = Properties.Settings.Default.MeterIP.Split(':')[1];
-                _meter = new DDS238(false, null, ip, int.Parse(port), true, true);
-            }
-            else
-            {
-                _meter = new DDS238(false, new SerialPortInterface(Properties.Settings.Default.MeterPortName, Properties.Settings.Default.MeterBaudRate,
-                    Properties.Settings.Default.MeterDataBits, Properties.Settings.Default.MeterParity,
-                    Properties.Settings.Default.MeterHandShake, Properties.Settings.Default.MeterStopBits), string.Empty,
-                    0, false, true);
-            }
+
+            var ip = "192.168.0.221";
+            var port = "8899";
+            _meter = new DDS238(false, null, ip, int.Parse(port), true, true, _path);
+
 
             Thread.Sleep(2000);
 
@@ -211,59 +191,62 @@ namespace CCD
             }
             else
             {
-                if (!_bloqueoCierrePorTimeOut)
-                {
-                    _bloqueoCierrePorTimeOut = true;
-                    _inverter.ApagarGrid();
-                    Thread.Sleep(1000);
-                    _gc.ApagaConsumos();
-                    Thread.Sleep(4000);
-                    ReiniciaApp();
-                }
+                //if (!_bloqueoCierrePorTimeOut)
+                //{
+                //    _bloqueoCierrePorTimeOut = true;
+                //    _inverter.ApagarGrid();
+                //    Thread.Sleep(1000);
+                //    _gc.ApagaConsumos();
+                //    Thread.Sleep(4000);
+                //    ReiniciaApp();
+                //}
 
             }
             EscribeLog(string.Format("Estado monitor {0}", _meter.Status));
 
-            _meteo = new Meteo();
+            _meteo = new Meteo(_path);
             _meteo.Inicia();
+
+            _gc = GestionCarga.GetInstance();
+            _gc.Inicia(dispositivos);
         }
         public void EstadoApp()
         {
 
-            #region Reinicia App cada 24 hora
-            if ( DateTime.Now.Minute == 0 && DateTime.Now.Second == 0) // DateTime.Now.Hour == 0 && cada 24 hora
-            {
-                _isBusy = true;
+            //#region Reinicia App cada 24 hora
+            //if (DateTime.Now.Minute == 0 && DateTime.Now.Second == 0) // DateTime.Now.Hour == 0 && cada 24 hora
+            //{
+            //    _isBusy = true;
 
-                if (DateTime.Now.Hour == 0) // escribir los datos de la última lectura del medidor para el día en curso
-                {
-                    _initExportkWh = _meter.ExportkWh;
-                    _initImportkWh = _meter.ImportkWh;
-                    _today = DateTime.Today;
-                    _ultimaPotenciaInv = 0;
+            //    if (DateTime.Now.Hour == 0) // escribir los datos de la última lectura del medidor para el día en curso
+            //    {
+            //        _initExportkWh = _meter.ExportkWh;
+            //        _initImportkWh = _meter.ImportkWh;
+            //        _today = DateTime.Today;
+            //        _ultimaPotenciaInv = 0;
 
-                    EscribeEstado();
-                    Thread.Sleep(2000);
-                }
+            //        EscribeEstado();
+            //        Thread.Sleep(2000);
+            //    }
 
-                ReiniciaApp();
+            //    ReiniciaApp();
 
-                _isBusy = false;
+            //    _isBusy = false;
 
-            }
-            #endregion
-
-        }
-        public void ReiniciaApp()
-        {
-            _gc.Dispositivos.First(p => p.Nombre.Equals("medidor")).CambiaEstado(false);
-            Thread.Sleep(5000);
-            Process cmd = new Process();
-            cmd.StartInfo.FileName = _nombreProceso + @".exe";
-            cmd.StartInfo.WorkingDirectory = Environment.CurrentDirectory;
-            cmd.Start();
+            //}
+            //#endregion
 
         }
+        //public void ReiniciaApp()
+        //{
+        //    _gc.Dispositivos.First(p => p.Nombre.Equals("medidor")).CambiaEstado(false);
+        //    Thread.Sleep(5000);
+        //    Process cmd = new Process();
+        //    cmd.StartInfo.FileName = _nombreProceso + @".exe";
+        //    cmd.StartInfo.WorkingDirectory = Environment.CurrentDirectory;
+        //    cmd.Start();
+
+        //}
         public void Monitor(object sender, System.Timers.ElapsedEventArgs e)
         {
             //if (DateTime.Now.Second == 0 && DateTime.Now.Minute % 3 == 0)
@@ -274,22 +257,22 @@ namespace CCD
             {
                 if (_cuentaMedidorSinConexion >= _medidorTimeOut)
                 {
-                    if (!_bloqueoCierrePorTimeOut)
-                    {
-                        _bloqueoCierrePorTimeOut = true;
-                        EscribeLog("Apagando todas las cargas");
-                        _inverter.ApagarGrid();
-                        Thread.Sleep(1000);
-                        _gc.ApagaConsumos();
-                        Thread.Sleep(4000);
+                    //if (!_bloqueoCierrePorTimeOut)
+                    //{
+                    //    _bloqueoCierrePorTimeOut = true;
+                    //    EscribeLog("Apagando todas las cargas");
+                    //    _inverter.ApagarGrid();
+                    //    Thread.Sleep(1000);
+                    //    _gc.ApagaConsumos();
+                    //    Thread.Sleep(4000);
 
-                        ReiniciaApp();
-                    }
+                    //    ReiniciaApp();
+                    //}
                 }
                 else
                 {
                     _cuentaMedidorSinConexion++;
-                    Console.WriteLine("medidor sin conexión pasada {0}", _cuentaMedidorSinConexion);
+                    EscribeLog(string.Format("medidor sin conexión pasada {0}", _cuentaMedidorSinConexion));
                 }
             }
             else
@@ -302,7 +285,7 @@ namespace CCD
                     if (_meter.Status)
                     {
                         #region ciclo repetitivo de analisis de consumos
-                        if (DateTime.Now.Second % Properties.Settings.Default.CadaXSegundos == 0)
+                        if (DateTime.Now.Second % 3 == 0)
                         {
                             //EscribeLog("--------------------------------------");
                             //cc.Mantiene(_meter.ActivePower);
@@ -374,8 +357,7 @@ namespace CCD
                                             _envioAviso = true;
                                             _inverter.EncenderAviso();
                                         }
-                                        if (Properties.Settings.Default.AvisoSonoro)
-                                            Console.Beep();
+                                       
                                         Console.ForegroundColor = ConsoleColor.Red;
                                         EscribeLog("Exportando");
                                         Console.ResetColor();
@@ -460,12 +442,12 @@ namespace CCD
 
             try
             {
-                var dd = new System.IO.FileInfo("est.txt");
+                var dd = new System.IO.FileInfo(Path.Combine(_path, "est.txt"));
                 if (dd.Exists)
                     dd.Delete();
                 Thread.Sleep(500);
 
-                System.IO.StreamWriter _tu = new System.IO.StreamWriter("est.txt");
+                System.IO.StreamWriter _tu = new System.IO.StreamWriter(Path.Combine(_path, "est.txt"));
                 _tu.WriteLine("{0};{1};{2};{3};{4};{5};{6};{7};{8};{9};{10};{11};{12};{13}",
                     _ultimaPotenciaInv,
                     _envioOrdenApagadoGrid,
@@ -554,51 +536,7 @@ namespace CCD
 
             //}
         }
-        private void _serverLog_InputData(object sender, InputDataEventArgs e)
-        {
-            try
-            {
-                //string entrada = System.Text.Encoding.ASCII.GetString(e.BusinessObject).Trim();
-                //entrada = System.Text.RegularExpressions.Regex.Replace(entrada, @"[^\w\s.!@$%^&*()\-\/]+", "");
-                //Console.WriteLine("Entrada {0}", entrada);
-                //bool ac;
-                //if (entrada.Contains("q1"))
-                //{
-                //    ac = _gc.Dispositivos.Find(p => p.Nombre.Equals("Bomba02")).Estado;
-                //    _gc.Dispositivos.Find(p => p.Nombre.Equals("Bomba02")).CambiaEstado(!ac);
-                //    Console.WriteLine("Cambia estado Bomba02 {0}", ac);
-                //}
-                //if (entrada.Contains("q2"))
-                //{
-                //    ac = _gc.Dispositivos.Find(p => p.Nombre.Equals("Bomba01")).Estado;
-                //    _gc.Dispositivos.Find(p => p.Nombre.Equals("Bomba01")).CambiaEstado(!ac);
-                //    Console.WriteLine("Cambia estado Bomba01 {0}", ac);
-                //}
-                //if (entrada.Contains("q3"))
-                //{
-                //    ac = _gc.Dispositivos.Find(p => p.Nombre.Equals("Filtro")).Estado;
-                //    _gc.Dispositivos.Find(p => p.Nombre.Equals("Filtro")).CambiaEstado(!ac);
-                //    Console.WriteLine("Cambia estado Filtro {0}", ac);
-                //}
-                //if (entrada.Contains("qD"))
-                //{
-                //    DetenerControl(true);
-                //    Console.WriteLine("Deteniendo control de carga -> Entrada:|{0}|", entrada);
-                //}
-
-                //if (entrada.Contains("qR"))
-                //{
-                //    DetenerControl(false);
-                //    Console.WriteLine("Reanudando control de carga ->Entrada:|{0}|", entrada);
-                //}
-            }
-            catch (Exception ex)
-            {
-
-                Console.WriteLine(ex);
-            }
-
-        }
+        
 
         private void FinalizarInstanciaPrevia()
         {
@@ -632,7 +570,7 @@ namespace CCD
 
         public string Resumen()
         {
-            using (FileStream stream = File.Open("resumen.csv", FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (FileStream stream = File.Open(Path.Combine(_path, "resumen.csv"), FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 using (StreamReader reader = new StreamReader(stream))
                 {

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CCD\CCD.csproj" />
+    <ProjectReference Include="..\ModBus\ModBus.csproj" />
+  </ItemGroup>
+
+</Project>

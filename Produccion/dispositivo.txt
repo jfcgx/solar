@@ -1,0 +1,11 @@
+LedTablero,Led,24,1,LedTablero,2,192.168.0.44,tasmota,Dual,1,false
+AmbarTablero,Luz,100,1,AmbarTablero,2,192.168.0.44,tasmota,Dual,2,false
+LedPiscina,Led,7,1,LedPiscina,2,192.168.0.44,tasmota,Dual,3,false
+LedPileta,Led,30,1,LedPileta,2,192.168.0.45,tasmota,Dual,2,false
+AmbarPileta,Luz,100,1,AmbarPileta,2,192.168.0.45,tasmota,Dual,1,false
+Filtro,Filtro,1000,1,filtro_piscina,2,192.168.0.52,tasmota,Basic,1,false
+LedRio,Led,84,1,LedRio,2,192.168.0.50,tasmota,Dual,1,false
+AmbarFrambuesa,Luz,100,1,AmbarFrambuesa,2,192.168.0.47,tasmota,Basic,1,false
+AmbarInvernadero,Luz,150,1,AmbarInvernadero,2,192.168.0.46,tasmota,Basic,1,false
+Bomba02,BombaRiego,1500,2,bomba02,2,192.168.0.50,tasmota,Dual,2,true
+medidor,Filtro,1000,1,medidor,2,192.168.0.51,tasmota,Basic,1,true

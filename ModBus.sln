@@ -23,6 +23,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Meteo", "Meteo\Meteo.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Control", "Control\Control.csproj", "{9D31C6BD-BC1B-4D2D-B8B3-A115CA6BEAD6}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ParcelaSolar", "ParcelaSolar\ParcelaSolar\ParcelaSolar.csproj", "{E1213CB5-A846-41D2-87BD-C62C457CCB9D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParcelaSolar.Android", "ParcelaSolar\ParcelaSolar.Android\ParcelaSolar.Android.csproj", "{9ABE1724-AE03-4844-8B4D-801C5F9975E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CCDStandar", "CCDStandar\CCDStandar.csproj", "{CE116C5A-846C-4B15-978C-2E4902443CFD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +75,20 @@ Global
 		{9D31C6BD-BC1B-4D2D-B8B3-A115CA6BEAD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9D31C6BD-BC1B-4D2D-B8B3-A115CA6BEAD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9D31C6BD-BC1B-4D2D-B8B3-A115CA6BEAD6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1213CB5-A846-41D2-87BD-C62C457CCB9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1213CB5-A846-41D2-87BD-C62C457CCB9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1213CB5-A846-41D2-87BD-C62C457CCB9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1213CB5-A846-41D2-87BD-C62C457CCB9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9ABE1724-AE03-4844-8B4D-801C5F9975E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9ABE1724-AE03-4844-8B4D-801C5F9975E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9ABE1724-AE03-4844-8B4D-801C5F9975E3}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{9ABE1724-AE03-4844-8B4D-801C5F9975E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9ABE1724-AE03-4844-8B4D-801C5F9975E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9ABE1724-AE03-4844-8B4D-801C5F9975E3}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{CE116C5A-846C-4B15-978C-2E4902443CFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE116C5A-846C-4B15-978C-2E4902443CFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE116C5A-846C-4B15-978C-2E4902443CFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE116C5A-846C-4B15-978C-2E4902443CFD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
