@@ -41,9 +41,10 @@ namespace ParcelaSolar.Droid
             var dispositivos = System.IO.File.ReadAllLines(archivo.FullName).ToList();
 
             ccd = ControladorConsumo.GetInstance(ssdsd.FullName);
-
+         
             ccd.Inicia(dispositivos);
         }
+
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
         {
             Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);

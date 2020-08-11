@@ -13,6 +13,8 @@ namespace ParcelaSolar.Views
         public MainPage()
         {
             InitializeComponent();
+            
+           
         }
     }
 }

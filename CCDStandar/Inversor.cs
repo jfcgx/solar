@@ -13,6 +13,19 @@ namespace CCDStandar
     public class Inversor
     {
         //https://github.com/egophil/PV-SysReader
+
+        #region eventos
+        public event EventHandler<LogEventArgs> Log;
+        protected void LogChanged(object sender, string e)
+        {
+            var handler = Log;
+            if (handler == null)
+                return;
+
+            handler(sender, new LogEventArgs(e));
+        }
+        #endregion
+
         Dispositivo _swInversor = new Dispositivo("Inversor", EnumTipoCarga.Inversor, -2000,0, "grid", 3, string.Empty,  ConnectionType.tasmota, ModuleType.Basic, "1", true);
 
         HttpClient httpClient = new HttpClient();
@@ -135,7 +148,9 @@ namespace CCDStandar
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Ejecuta trigger: {0} {1}", trigger, ex);
+
+                LogChanged(this, string.Format("Ejecuta trigger: {0} {1}", trigger, ex));
+
                 esExito = false;
             }
             return esExito;
@@ -218,7 +233,8 @@ namespace CCDStandar
 
             if (_countTime >= _timeOut)
             {
-                Console.WriteLine("Inversor Timeout");
+                LogChanged(this, string.Format("Inversor Timeout"));
+
                 _cuentaTimeOutParaReiniciarElSocket++;
 
 
@@ -237,7 +253,13 @@ namespace CCDStandar
                 _cuentaTimeOutParaReiniciarElSocket = 0;
             }
         }
-       
+
+        internal void Close()
+        {
+            _clientRs.TerminaSocket();
+            _timer.Close();
+        }
+
         public int LittleEndianVal(byte[] buffer, int index, int largo)
         {
             int vr = 0;

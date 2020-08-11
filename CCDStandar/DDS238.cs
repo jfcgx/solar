@@ -13,7 +13,19 @@ namespace CCDStandar
     public class DDS238
     {
         //http://modbus.rapidscada.net/
+        
+        #region eventos
+        public event EventHandler<LogEventArgs> Log;
+        protected void LogChanged(object sender, string e)
+        {
+            var handler = Log;
+            if (handler == null)
+                return;
 
+            handler(sender, new LogEventArgs(e));
+        }
+        #endregion
+        
         SerialPortInterface _serialPortInterface;//= new SerialPortInterface(Settings.Default.MeterPortName, Settings.Default.MeterBaudRate, Settings.Default.MeterDataBits, Settings.Default.MeterParity,Settings.Default.MeterHandShake,Settings.Default.MeterStopBits);
         SendFrameFormat _dsf;
         ReceiveFrameFormat _drf;
@@ -37,7 +49,7 @@ namespace CCDStandar
         SocketServer _serverLog = new SocketServer();
         bool _status;
         SuperSocketClient _clientRs;
-        System.IO.StreamWriter _t;
+        //System.IO.StreamWriter _t;
         System.IO.StreamWriter _f;
         System.Timers.Timer _timer = new System.Timers.Timer();
         int _countTime;
@@ -254,6 +266,7 @@ namespace CCDStandar
                             default:
                                 break;
                         }
+                        _isBusy = false;
                         EnviaSolicitud();
                     }
                 }
@@ -261,6 +274,7 @@ namespace CCDStandar
                 {
 
                     _registerAddress = DDSRegisterAddress.ActivePower;
+                    _isBusy = false;
                     EnviaSolicitud();
                 }
                 else if (DateTime.Now.Second % 15 == 0)
@@ -280,6 +294,7 @@ namespace CCDStandar
                                 break;
                         }
 
+                        _isBusy = false;
                         EnviaSolicitud();
                     }
                 }
@@ -298,12 +313,12 @@ namespace CCDStandar
             {
                 _status = _clientRs.BinaryWriter(_dsf.ToBytes());
 
-                //if (_muestraDatosConsola)
-                //{
-                //    Console.WriteLine("BinaryWriter");
-                //    _dsf.ToBytes().ToList().ForEach(item => Console.Write(string.Format("{0:X} ", item)));
-                //    Console.WriteLine();
-                //}
+                if (_muestraDatosConsola)
+                {
+                    Console.WriteLine("BinaryWriter");
+                    _dsf.ToBytes().ToList().ForEach(item => Console.Write(string.Format("{0:X} ", item)));
+                    Console.WriteLine();
+                }
             }
             else
             {
@@ -318,12 +333,12 @@ namespace CCDStandar
 
             if (_countTime >= _timeOut)
             {
-                Console.WriteLine("Medidor Timeout");
+                LogChanged(this, "Medidor Timeout");
                 _cuentaTimeOut++;
-                if(_cuentaTimeOut >= _maxTimeOut)
+                if (_cuentaTimeOut >= _maxTimeOut)
                 {
-                    _clientRs.TerminaSocket();
-                    _clientRs.IniciarSocket();
+                    //_clientRs.TerminaSocket();
+                    //_clientRs.IniciarSocket();
                 }
             }
             else
@@ -332,6 +347,20 @@ namespace CCDStandar
                 PrintStatus(true);
             }
 
+        }
+
+        internal void Close()
+        {
+            _clientRs.TerminaSocket();
+            _timer.Close();
+            _timer.Elapsed -= Tarea;
+            _f.Close();
+            _serverLog.Closed();
+
+            _clientRs = null;
+            _timer = null;
+            _f = null;
+            _serverLog = null;
         }
 
         private void PrintStatus(bool escribeLog)
@@ -364,6 +393,9 @@ namespace CCDStandar
         {
             var log = obj.ToString();
             _serverLog.Send(log + System.Environment.NewLine);
+
+            LogChanged(this, log + System.Environment.NewLine);
+
             if (_muestraDatosConsola)
                 Console.WriteLine(log);
         }

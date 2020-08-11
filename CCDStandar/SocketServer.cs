@@ -108,14 +108,15 @@ namespace CCDStandar
                         Console.WriteLine(" >> Interrupted ");
                     }
                 }
-                if (_clientSocket.Connected)
-                {
-                    Console.WriteLine(" >> " + "Client No: " + Convert.ToString(_clientes.Count) + " started!");
-                    HandleClinet client = new HandleClinet();
-                    client.InputData += new EventHandler<InputDataEventArgs>(Program_InputChanged);
-                    client.StartClient(_clientSocket, Convert.ToString(_clientes.Count));
-                    _clientes.Add(client);
-                }
+                if (_clientSocket != null)
+                    if (_clientSocket.Connected)
+                    {
+                        Console.WriteLine(" >> " + "Client No: " + Convert.ToString(_clientes.Count) + " started!");
+                        HandleClinet client = new HandleClinet();
+                        client.InputData += new EventHandler<InputDataEventArgs>(Program_InputChanged);
+                        client.StartClient(_clientSocket, Convert.ToString(_clientes.Count));
+                        _clientes.Add(client);
+                    }
                 Thread.Sleep(100);
             }
         }

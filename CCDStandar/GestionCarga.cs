@@ -70,19 +70,6 @@ namespace CCDStandar
             _dispositivos = new List<Dispositivo>();
 
             
-            //dispositivos.Add("LedTablero,Led,24,1,LedTablero,2,192.168.0.44,tasmota,Dual,1,false");
-            //dispositivos.Add("AmbarTablero,Luz,100,1,AmbarTablero,2,192.168.0.44,tasmota,Dual,2,false");
-            //dispositivos.Add("LedPiscina,Led,7,1,LedPiscina,2,192.168.0.44,tasmota,Dual,3,false");
-            //dispositivos.Add("LedPileta,Led,30,1,LedPileta,2,192.168.0.45,tasmota,Dual,2,false");
-            //dispositivos.Add("AmbarPileta,Luz,100,1,AmbarPileta,2,192.168.0.45,tasmota,Dual,1,false");
-            //dispositivos.Add("Filtro,Filtro,1000,1,filtro_piscina,2,192.168.0.52,tasmota,Basic,1,false");
-            //dispositivos.Add("LedRio,Led,84,1,LedRio,2,192.168.0.50,tasmota,Dual,1,false");
-            //dispositivos.Add("AmbarFrambuesa,Luz,100,1,AmbarFrambuesa,2,192.168.0.47,tasmota,Basic,1,false");
-            //dispositivos.Add("AmbarInvernadero,Luz,150,1,AmbarInvernadero,2,192.168.0.46,tasmota,Basic,1,false");
-            //dispositivos.Add("Bomba02,BombaRiego,1500,2,bomba02,2,192.168.0.50,tasmota,Dual,2,true");
-            //dispositivos.Add("medidor,Filtro,1000,1,medidor,2,192.168.0.51,tasmota,Basic,1,true");
-
-
 
             foreach (var item in dispositivos)
             {
@@ -106,32 +93,6 @@ namespace CCDStandar
             }
 
 
-            //Dispositivo Termo = new Dispositivo("Termo", EnumTipoCarga.Luz, 1500, 2, "Termo", 0, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
-            //Dispositivo AmbarInvernadero = new Dispositivo("AmbarInvernadero", EnumTipoCarga.Luz, 150, 1, "AmbarInvernadero", 3, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
-            //Dispositivo AmbarTablero = new Dispositivo("AmbarTablero", EnumTipoCarga.Luz, 100, 1, "l03ambar", 3, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
-            //Dispositivo AmbarPileta = new Dispositivo("AmbarPileta", EnumTipoCarga.Luz, 100, 1, "l02ambar", 3, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
-            //Dispositivo LedPileta = new Dispositivo("LedPileta", EnumTipoCarga.Luz, 30, 1, "l01led", 5, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
-            //Dispositivo LedTablero = new Dispositivo("LedTablero", EnumTipoCarga.Luz, 100, 1, "l02led", 5, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY); //porque tenia 100?
-            //Dispositivo Filtro = new Dispositivo("Filtro", EnumTipoCarga.Filtro, 1000, 1, "filtro_piscina", 2, "192.168.0.52", ConnectionType.tasmota, ModuleType.Basic, "1");
-            //Dispositivo LedRio = new Dispositivo("LedRio", EnumTipoCarga.Led, 70, 1, "LedRio", 2, "192.168.0.50", ConnectionType.tasmota, ModuleType.Dual, "1");//0,37kw segun mANUL
-            //Dispositivo Bomba02 = new Dispositivo("Bomba02", EnumTipoCarga.BombaRiego, 1500, 2, "bomba02", 2, "192.168.0.50", ConnectionType.tasmota, ModuleType.Dual, "2");
-            //Dispositivo medidor = new Dispositivo("medidor", EnumTipoCarga.Filtro, 1000, 1, "medidor", 2, "192.168.0.51", ConnectionType.tasmota, ModuleType.Basic, "1");
-
-
-            //_dispositivos.Add(Termo);
-            //_dispositivos.Add(AmbarInvernadero);
-            //_dispositivos.Add(AmbarTablero);
-            //_dispositivos.Add(AmbarPileta);
-            //_dispositivos.Add(LedPileta);
-            //_dispositivos.Add(LedTablero);
-            //_dispositivos.Add(Filtro);
-            //_dispositivos.Add(LedRio);
-            //_dispositivos.Add(Bomba02);
-            //_dispositivos.Add(medidor);
-
-            //_dispositivos.First(p => p.Nombre.Equals("Bomba02")).Bloqueo = true;
-
-            //_dispositivos.First(p => p.Nombre.Equals("medidor")).Bloqueo = true;
 
             _dispositivos.First(p => p.Nombre.Equals("medidor")).CambiaEstado(true);
             Thread.Sleep(3000);
@@ -202,6 +163,14 @@ namespace CCDStandar
         {
             _dispositivos.Where(p=>!p.Bloqueo).ToList().ForEach(a => a.CambiaEstado(false));
         }
+
+        internal void Finaliza()
+        {
+            _dispositivos.ForEach(a => a.Finaliza());
+            _dispositivos = null;
+
+        }
+
         public  void EnPausa(bool valor)
         {
             _enPausa = valor;
@@ -321,11 +290,6 @@ namespace CCDStandar
                         else
                         {
                             _countEsperaIncremento++;
-
-                            //if (Math.Abs( potenciaActiva ) > 400)
-                            //{
-                            //    _countEsperaIncremento++;
-                            //}
                         }
                     }
                     else
@@ -334,16 +298,6 @@ namespace CCDStandar
                     }
 
                     _cargaTotal = 0;
-                    
-                    //_cargaTotal += _dispositivos.First(p => p.Nombre.Equals("Termo")).Estado ? _dispositivos.First(p => p.Nombre.Equals("Termo")).PowerConsumption : 0;
-                    //_cargaTotal += _dispositivos.First(p => p.Nombre.Equals("AmbarInvernadero")).Estado ? _dispositivos.First(p => p.Nombre.Equals("AmbarInvernadero")).PowerConsumption : 0;
-                    //_cargaTotal += _dispositivos.First(p => p.Nombre.Equals("LedRio")).Estado ? _dispositivos.First(p => p.Nombre.Equals("LedRio")).PowerConsumption : 0;
-                    //_cargaTotal += _dispositivos.First(p => p.Nombre.Equals("LedPileta")).Estado ? _dispositivos.First(p => p.Nombre.Equals("LedPileta")).PowerConsumption : 0;
-                    //_cargaTotal += _dispositivos.First(p => p.Nombre.Equals("LedTablero")).Estado ? _dispositivos.First(p => p.Nombre.Equals("LedTablero")).PowerConsumption : 0;
-                    //_cargaTotal += _dispositivos.First(p => p.Nombre.Equals("AmbarTablero")).Estado ? _dispositivos.First(p => p.Nombre.Equals("AmbarTablero")).PowerConsumption : 0;
-                    //_cargaTotal += _dispositivos.First(p => p.Nombre.Equals("AmbarPileta")).Estado ? _dispositivos.First(p => p.Nombre.Equals("AmbarPileta")).PowerConsumption : 0;
-                    //_cargaTotal += _dispositivos.First(p => p.Nombre.Equals("Filtro")).Estado ? _dispositivos.First(p => p.Nombre.Equals("Filtro")).PowerConsumption : 0;
-
 
                     _cargaTotal = _dispositivos.Where(a => !a.Bloqueo).Where(b=>b.Estado).Sum(p => p.PowerConsumption);
 
@@ -481,3 +435,55 @@ namespace CCDStandar
 
     }
 }
+
+//dispositivos.Add("LedTablero,Led,24,1,LedTablero,2,192.168.0.44,tasmota,Dual,1,false");
+//dispositivos.Add("AmbarTablero,Luz,100,1,AmbarTablero,2,192.168.0.44,tasmota,Dual,2,false");
+//dispositivos.Add("LedPiscina,Led,7,1,LedPiscina,2,192.168.0.44,tasmota,Dual,3,false");
+//dispositivos.Add("LedPileta,Led,30,1,LedPileta,2,192.168.0.45,tasmota,Dual,2,false");
+//dispositivos.Add("AmbarPileta,Luz,100,1,AmbarPileta,2,192.168.0.45,tasmota,Dual,1,false");
+//dispositivos.Add("Filtro,Filtro,1000,1,filtro_piscina,2,192.168.0.52,tasmota,Basic,1,false");
+//dispositivos.Add("LedRio,Led,84,1,LedRio,2,192.168.0.50,tasmota,Dual,1,false");
+//dispositivos.Add("AmbarFrambuesa,Luz,100,1,AmbarFrambuesa,2,192.168.0.47,tasmota,Basic,1,false");
+//dispositivos.Add("AmbarInvernadero,Luz,150,1,AmbarInvernadero,2,192.168.0.46,tasmota,Basic,1,false");
+//dispositivos.Add("Bomba02,BombaRiego,1500,2,bomba02,2,192.168.0.50,tasmota,Dual,2,true");
+//dispositivos.Add("medidor,Filtro,1000,1,medidor,2,192.168.0.51,tasmota,Basic,1,true");
+
+
+
+//_cargaTotal += _dispositivos.First(p => p.Nombre.Equals("Termo")).Estado ? _dispositivos.First(p => p.Nombre.Equals("Termo")).PowerConsumption : 0;
+//_cargaTotal += _dispositivos.First(p => p.Nombre.Equals("AmbarInvernadero")).Estado ? _dispositivos.First(p => p.Nombre.Equals("AmbarInvernadero")).PowerConsumption : 0;
+//_cargaTotal += _dispositivos.First(p => p.Nombre.Equals("LedRio")).Estado ? _dispositivos.First(p => p.Nombre.Equals("LedRio")).PowerConsumption : 0;
+//_cargaTotal += _dispositivos.First(p => p.Nombre.Equals("LedPileta")).Estado ? _dispositivos.First(p => p.Nombre.Equals("LedPileta")).PowerConsumption : 0;
+//_cargaTotal += _dispositivos.First(p => p.Nombre.Equals("LedTablero")).Estado ? _dispositivos.First(p => p.Nombre.Equals("LedTablero")).PowerConsumption : 0;
+//_cargaTotal += _dispositivos.First(p => p.Nombre.Equals("AmbarTablero")).Estado ? _dispositivos.First(p => p.Nombre.Equals("AmbarTablero")).PowerConsumption : 0;
+//_cargaTotal += _dispositivos.First(p => p.Nombre.Equals("AmbarPileta")).Estado ? _dispositivos.First(p => p.Nombre.Equals("AmbarPileta")).PowerConsumption : 0;
+//_cargaTotal += _dispositivos.First(p => p.Nombre.Equals("Filtro")).Estado ? _dispositivos.First(p => p.Nombre.Equals("Filtro")).PowerConsumption : 0;
+
+
+
+//Dispositivo Termo = new Dispositivo("Termo", EnumTipoCarga.Luz, 1500, 2, "Termo", 0, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
+//Dispositivo AmbarInvernadero = new Dispositivo("AmbarInvernadero", EnumTipoCarga.Luz, 150, 1, "AmbarInvernadero", 3, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
+//Dispositivo AmbarTablero = new Dispositivo("AmbarTablero", EnumTipoCarga.Luz, 100, 1, "l03ambar", 3, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
+//Dispositivo AmbarPileta = new Dispositivo("AmbarPileta", EnumTipoCarga.Luz, 100, 1, "l02ambar", 3, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
+//Dispositivo LedPileta = new Dispositivo("LedPileta", EnumTipoCarga.Luz, 30, 1, "l01led", 5, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY);
+//Dispositivo LedTablero = new Dispositivo("LedTablero", EnumTipoCarga.Luz, 100, 1, "l02led", 5, string.Empty, (ConnectionType)Settings.Default.ConnectionType, ModuleType.Basic, Settings.Default.IFTTT_KEY); //porque tenia 100?
+//Dispositivo Filtro = new Dispositivo("Filtro", EnumTipoCarga.Filtro, 1000, 1, "filtro_piscina", 2, "192.168.0.52", ConnectionType.tasmota, ModuleType.Basic, "1");
+//Dispositivo LedRio = new Dispositivo("LedRio", EnumTipoCarga.Led, 70, 1, "LedRio", 2, "192.168.0.50", ConnectionType.tasmota, ModuleType.Dual, "1");//0,37kw segun mANUL
+//Dispositivo Bomba02 = new Dispositivo("Bomba02", EnumTipoCarga.BombaRiego, 1500, 2, "bomba02", 2, "192.168.0.50", ConnectionType.tasmota, ModuleType.Dual, "2");
+//Dispositivo medidor = new Dispositivo("medidor", EnumTipoCarga.Filtro, 1000, 1, "medidor", 2, "192.168.0.51", ConnectionType.tasmota, ModuleType.Basic, "1");
+
+
+//_dispositivos.Add(Termo);
+//_dispositivos.Add(AmbarInvernadero);
+//_dispositivos.Add(AmbarTablero);
+//_dispositivos.Add(AmbarPileta);
+//_dispositivos.Add(LedPileta);
+//_dispositivos.Add(LedTablero);
+//_dispositivos.Add(Filtro);
+//_dispositivos.Add(LedRio);
+//_dispositivos.Add(Bomba02);
+//_dispositivos.Add(medidor);
+
+//_dispositivos.First(p => p.Nombre.Equals("Bomba02")).Bloqueo = true;
+
+//_dispositivos.First(p => p.Nombre.Equals("medidor")).Bloqueo = true;

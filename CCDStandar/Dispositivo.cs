@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -14,13 +15,23 @@ namespace CCDStandar
 {
     public class Dispositivo
     {
+        #region eventos
+        public event EventHandler<LogEventArgs> Log;
+        protected void LogChanged(object sender, string e)
+        {
+            var handler = Log;
+            if (handler == null)
+                return;
+
+            handler(sender, new LogEventArgs(e));
+        }
+        #endregion
+
         static Random random = new Random();
         HttpClient httpClient = new HttpClient();
         //private Conexion _conexion;
         private System.Timers.Timer _timer;
         private bool _estaOcupado;
-        private int _timeOut =10;
-        private int _cuentaEsperaRespuesta;
         private string _nombre;
         private int _powerConsumption;
         private string _ip;
@@ -28,10 +39,10 @@ namespace CCDStandar
         private bool _estado;
         private bool _mantieneEstado;
         private ConnectionType _connection;
-        private ModuleType  _moduleType;
+        private ModuleType _moduleType;
         private string _key;
-        public  string PowerOff ;
-        public  string PowerOn ;
+        public string PowerOff;
+        public string PowerOn;
         private bool _manual;
         int _ponderacion;
         double _temperatura;
@@ -224,11 +235,11 @@ namespace CCDStandar
                                 }
                             }
                             break;
-                    }                  
+                    }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex);
+                    LogChanged(this, ex.Message);
                 }
             }
         }
@@ -238,7 +249,7 @@ namespace CCDStandar
             try
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("Envia estado al dispositivo {0} con {1} valor {2}", _nombre, _connection.ToString(), value);
+                LogChanged(this, string.Format("Envia estado al dispositivo {0} con {1} valor {2}", _nombre, _connection.ToString(), value));
                 Console.ResetColor();
                 if (value)
                 {
@@ -250,7 +261,7 @@ namespace CCDStandar
                             break;
                         case ConnectionType.tasmota:
                             var result = CURLTASMOTA(_ip, PowerOn);
-                            valueSet = result.Result;
+                            valueSet = result;
                             _estado = valueSet;
                             break;
                         case ConnectionType.mqtt:
@@ -269,7 +280,7 @@ namespace CCDStandar
                             break;
                         case ConnectionType.tasmota:
                             var result = CURLTASMOTA(_ip, PowerOff);
-                            valueSet = result.Result;
+                            valueSet = result;
                             _estado = valueSet;
                             break;
                         case ConnectionType.mqtt:
@@ -281,9 +292,33 @@ namespace CCDStandar
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                LogChanged(this, ex.Message);
             }
             return valueSet;
+        }
+
+        internal void Finaliza()
+        {
+
+            LogChanged(this, string.Format("Finaliza dispositivo {0}", _nombre));
+
+            Timer.Stop();
+            Timer.Close();
+
+            _nombre = string.Empty;
+            _tipoCarga = EnumTipoCarga.Ninguno;
+            _moduleType = ModuleType.Basic;
+            Ponderacion = 0;
+            this.Ip = string.Empty;
+            this.Key = string.Empty;
+            this.Connection = ConnectionType.tasmota;
+            this.Nombre = string.Empty;
+            this.PowerConsumption = 0;
+            this.Trigger = string.Empty;
+            _bloqueo = false;
+
+            PowerOn = string.Empty;
+            PowerOff = string.Empty;
         }
 
         public Dispositivo()
@@ -313,7 +348,7 @@ namespace CCDStandar
                 Timer = new System.Timers.Timer(interval);
                 Timer.Elapsed += timer_Elapsed;
                 Timer.Start();
-                Console.WriteLine("Dispositivo {0} se actualizará con un intervalo de {1:0.00} minutos", _nombre, interval / 60000);
+                LogChanged(this, string.Format("Dispositivo {0} se actualizará con un intervalo de {1:0.00} minutos", _nombre, interval / 60000));
             }
         }
         public void Inicia()
@@ -350,25 +385,7 @@ namespace CCDStandar
                             break;
                         case ConnectionType.tasmota:
                             var result = CURLTASMOTASTATUS(_ip, "1");
-                            _cuentaEsperaRespuesta = 0;
-                            while (!result.Result)
-                            {
-                                Thread.Sleep(10);
-                                _cuentaEsperaRespuesta++;
-                                if (_cuentaEsperaRespuesta > _timeOut)
-                                {
-                                    break;
-                                }
-
-                            }
-                            if (_cuentaEsperaRespuesta > _timeOut)
-                            {
-                                Console.WriteLine("Dispositivo {0} no responde", _nombre);
-                            }
-                            else
-                            {
-                                OnInputChanged(this);
-                            }
+                            OnInputChanged(this);
                             break;
                         case ConnectionType.mqtt:
                             break;
@@ -408,54 +425,54 @@ namespace CCDStandar
             }
             return esExito;
         }
-        public async Task<bool> CURLTASMOTA(string ip, string action)
+
+        public bool CURLTASMOTA(string ip, string action)
         {
-            bool estado = false;
+            bool valor = false;
+
+            string url = string.Format("http://{0}/cm?cmnd={1}", ip, action);
+
             try
             {
-                var parameters = new Dictionary<string, string>();
-                parameters["text"] = string.Empty;
-                string url = string.Empty;
 
-                url = string.Format("http://{0}/cm?cmnd={1}", ip, action);
+                NameValueCollection form = new NameValueCollection();
+                WebClient _cliente = new WebClient();
 
-                Console.WriteLine("Resultado para : {0}", url);
-                var response = await httpClient.PostAsync(url, new FormUrlEncodedContent(parameters));
-                var contents = await response.Content.ReadAsStringAsync();
-                Console.WriteLine("contents       : {0}", contents);
-                estado = contents.Contains("ON");
+                Byte[] responseData = _cliente.UploadValues(url, "post", form);
+
+                var _responseHTML = Encoding.ASCII.GetString(responseData);
+                valor = _responseHTML.Contains("ON");
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Ejecuta trigger: {0} {1}", ip, ex);
+                LogChanged(this, string.Format("Ejecuta trigger: {0} {1}", ip, ex));
             }
-            return estado;
+
+            return valor;
         }
-        public async Task<bool>  CURLTASMOTASTATUS(string ip, string action)
+        public bool CURLTASMOTASTATUS(string ip, string action)
         {
+            string url = string.Format("http://{0}/?m={1}", ip, action);
             bool respuesta = false;
+
             try
             {
-                var parameters = new Dictionary<string, string>();
-                parameters["text"] = string.Empty;
-                string url = string.Format("http://{0}/?m={1}", ip, action);
-                //Console.WriteLine("Resultado para : {0} {1}", url, _key);
-                var response = await httpClient.PostAsync(url, new FormUrlEncodedContent(parameters));
-                var contents = await response.Content.ReadAsStringAsync();
-                //Console.WriteLine("contents       : {0}", contents);
 
-                AnalizaRespuesta(contents);
-                respuesta = true;
+                NameValueCollection form = new NameValueCollection();
+                WebClient _cliente = new WebClient();
+                Byte[] responseData = _cliente.UploadValues(url, "post", form);
+
+                var _responseHTML = Encoding.ASCII.GetString(responseData);
+                AnalizaRespuesta(_responseHTML);
 
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Ejecuta trigger: {0} {1}", ip, ex);
+                LogChanged(this, string.Format("Ejecuta trigger: {0} {1}", ip, ex));
             }
             return respuesta;
         }
     }
-
     public enum ConnectionType
     {
         ifttt,
